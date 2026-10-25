@@ -1,7 +1,7 @@
 // Copyright 2022 Oxide Computer Company
 
 use quote::quote;
-use schemars::{gen::SchemaGenerator, schema::Schema, JsonSchema};
+use schemars::{gen::SchemaGenerator, schema::RootSchema, schema::Schema, JsonSchema};
 use serde::Serialize;
 use typify_impl::{TypeSpace, TypeSpacePatch, TypeSpaceSettings};
 
@@ -111,4 +111,60 @@ fn test_generation() {
     let fmt = rustfmt_wrapper::rustfmt(file.to_string()).unwrap();
 
     expectorate::assert_contents("tests/generator.out", fmt.as_str());
+}
+
+#[test]
+fn test_nullable_names_and_registration() {
+    let schema: RootSchema = serde_json::from_str(include_str!("nullable-names.json")).unwrap();
+    let mut type_space = TypeSpace::default();
+    type_space.add_root_schema(schema).unwrap();
+    let output = rustfmt_wrapper::rustfmt(type_space.to_stream().to_string()).unwrap();
+    for name in [
+        "NullableObject",
+        "OneOfEffort",
+        "ReasoningEffort",
+        "TitledNullableEnum",
+    ] {
+        assert!(
+            output.contains(&format!(
+                "pub struct {name}(pub ::std::option::Option<{name}Inner>);"
+            )),
+            "{output}"
+        );
+    }
+    assert!(
+        output.contains("pub struct RefNullable(pub ::std::option::Option<AuthorAssociation>);")
+    );
+    let file: syn::File = syn::parse_str(&output).unwrap();
+    let mut names = std::collections::BTreeSet::new();
+    for item in file.items {
+        let name = match item {
+            syn::Item::Struct(item) => item.ident,
+            syn::Item::Enum(item) => item.ident,
+            _ => continue,
+        };
+        assert!(
+            names.insert(name.to_string()),
+            "duplicate emitted type {name}"
+        );
+    }
+}
+
+#[test]
+fn test_inline_title_registration_preserves_distinct_schemas() {
+    let mut type_space = TypeSpace::default();
+    let first: Schema = serde_json::from_value(serde_json::json!({
+        "title": "Shared", "type": "string", "enum": ["first"]
+    }))
+    .unwrap();
+    let second: Schema = serde_json::from_value(serde_json::json!({
+        "title": "Shared", "type": "string", "enum": ["second"]
+    }))
+    .unwrap();
+    let first_id = type_space.add_type(&first).unwrap();
+    assert_eq!(first_id, type_space.add_type(&first).unwrap());
+    let second_id = type_space.add_type(&second).unwrap();
+    assert_ne!(first_id, second_id);
+    assert_eq!(type_space.get_type(&first_id).unwrap().name(), "Shared");
+    assert_eq!(type_space.get_type(&second_id).unwrap().name(), "Shared2");
 }

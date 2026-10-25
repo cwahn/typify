@@ -169,6 +169,20 @@ impl JsonSchema for TriplePattern {
 }
 
 fn main() {
+    // Compile the nullable naming regressions as real Rust, not just tokens.
+    let schema_path = "../typify-impl/tests/nullable-names.json";
+    println!("cargo:rerun-if-changed={schema_path}");
+    let schema = serde_json::from_str(&fs::read_to_string(schema_path).unwrap()).unwrap();
+    let mut nullable_types = TypeSpace::default();
+    nullable_types.add_root_schema(schema).unwrap();
+    let nullable_output =
+        prettyplease::unparse(&syn::parse2::<syn::File>(nullable_types.to_stream()).unwrap());
+    fs::write(
+        Path::new(&env::var("OUT_DIR").unwrap()).join("nullable_names.rs"),
+        nullable_output,
+    )
+    .unwrap();
+
     let mut type_space = TypeSpace::default();
 
     WithSet::add(&mut type_space);

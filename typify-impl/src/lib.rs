@@ -785,8 +785,22 @@ impl TypeSpace {
                 )
             }
         };
-        // TODO need a type alias?
         if let Some(entry_name) = type_entry.name() {
+            // A nested, titled schema may already have claimed the name of
+            // this definition (including through a forward reference). Keep
+            // the definition's required name and move the earlier entry to a
+            // distinct name. Its TypeId is stable, so all existing users keep
+            // referring to the same type rather than silently changing shape.
+            if let Some(existing_id) = self.name_to_id.get(entry_name).cloned() {
+                if existing_id != type_id {
+                    let new_name = self.unused_type_name(entry_name);
+                    self.id_to_entry
+                        .get_mut(&existing_id)
+                        .unwrap()
+                        .set_name(new_name.clone());
+                    self.name_to_id.insert(new_name, existing_id);
+                }
+            }
             self.name_to_id.insert(entry_name.clone(), type_id.clone());
         }
         self.id_to_entry.insert(type_id, type_entry);
@@ -960,36 +974,36 @@ impl TypeSpace {
         id
     }
 
+    /// Choose a deterministic name without replacing any registered type.
+    fn unused_type_name(&self, name: &str) -> String {
+        (2..)
+            .map(|suffix| format!("{}{}", name, suffix))
+            .find(|candidate| !self.name_to_id.contains_key(candidate))
+            .unwrap()
+    }
+
     /// Assign a TypeId for a TypeEntry. This handles resolving references,
     /// checking for duplicate type definitions (e.g. to make sure there aren't
     /// two conflicting types of the same name), and deduplicates various
     /// flavors of built-in types.
-    fn assign_type(&mut self, ty: TypeEntry) -> TypeId {
+    fn assign_type(&mut self, mut ty: TypeEntry) -> TypeId {
         if let TypeEntryDetails::Reference(type_id) = ty.details {
             type_id
         } else if let Some(name) = ty.name() {
-            // If there's already a type of this name, we make sure it's
-            // identical. Note that this covers all user-defined types.
-
-            // TODO there are many different choices we might make here
-            // that could differ depending on the texture of the schema.
-            // For example, a schema might use the string "Response" in a
-            // bunch of places and if that were the case we might expect
-            // them to be different and resolve that by renaming or scoping
-            // them in some way.
-            if let Some(type_id) = self.name_to_id.get(name) {
-                // TODO we'd like to verify that the type is structurally the
-                // same, but the types may not be functionally equal. This is a
-                // consequence of types being "finalized" after each type
-                // addition. This further emphasized the need for a more
-                // deliberate, multi-pass approach.
-                type_id.clone()
-            } else {
-                let type_id = self.assign();
-                self.name_to_id.insert(name.clone(), type_id.clone());
-                self.id_to_entry.insert(type_id.clone(), ty);
-                type_id
+            let mut name = name.clone();
+            if let Some(type_id) = self.name_to_id.get(&name) {
+                if self.id_to_entry[type_id].same_named_schema(&ty) {
+                    return type_id.clone();
+                }
+                // Titles are hints, not proof that two schemas are the same.
+                // Retain both shapes when a name is reused for another schema.
+                name = self.unused_type_name(&name);
+                ty.set_name(name.clone());
             }
+            let type_id = self.assign();
+            self.name_to_id.insert(name, type_id.clone());
+            self.id_to_entry.insert(type_id.clone(), ty);
+            type_id
         } else if let Some(type_id) = self.type_to_id.get(&ty.details) {
             type_id.clone()
         } else {

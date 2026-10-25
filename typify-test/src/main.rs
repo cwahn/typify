@@ -5,6 +5,45 @@ include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 
 fn main() {}
 
+#[allow(dead_code)]
+mod nullable_names {
+    include!(concat!(env!("OUT_DIR"), "/nullable_names.rs"));
+}
+
+#[test]
+fn test_nullable_names_round_trip() {
+    use nullable_names::*;
+    for value in [serde_json::Value::Null, serde_json::json!("low")] {
+        let effort: ReasoningEffort = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(serde_json::to_value(effort).unwrap(), value);
+        let effort: OneOfEffort = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(serde_json::to_value(effort).unwrap(), value);
+        let effort: TitledNullableEnum = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(serde_json::to_value(effort).unwrap(), value);
+    }
+    for value in [serde_json::Value::Null, serde_json::json!({"value": "ok"})] {
+        let object: NullableObject = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(serde_json::to_value(object).unwrap(), value);
+    }
+    for value in [serde_json::Value::Null, serde_json::json!("OWNER")] {
+        let reference: RefNullable = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(serde_json::to_value(reference).unwrap(), value);
+    }
+    let value = serde_json::json!({
+        "association": "OWNER", "different": "OTHER", "reference": "MEMBER"
+    });
+    let wrapper: AaaWrapper = serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(serde_json::to_value(wrapper).unwrap(), value);
+    assert!(serde_json::from_value::<AaaWrapper>(serde_json::json!({
+        "association": "OTHER", "different": "OTHER", "reference": "MEMBER"
+    }))
+    .is_err());
+    assert!(serde_json::from_value::<AaaWrapper>(serde_json::json!({
+        "association": "OWNER", "different": "OWNER", "reference": "MEMBER"
+    }))
+    .is_err());
+}
+
 #[test]
 fn test_with_set() {
     // Validate that a set is currently represented as a Vec

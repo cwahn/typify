@@ -20,6 +20,30 @@ use crate::{
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct SchemaWrapper(Schema);
 
+impl SchemaWrapper {
+    fn same_type_schema(&self, other: &Self) -> bool {
+        if self == other {
+            return true;
+        }
+        // A title is a naming hint, not a constraint. The same schema may be
+        // registered from a definition without a title and later supplied
+        // inline with one. Keep defaults and every other annotation intact.
+        fn without_title(schema: &Schema) -> Schema {
+            let mut schema = schema.clone();
+            if let Schema::Object(object) = &mut schema {
+                if let Some(metadata) = &mut object.metadata {
+                    metadata.title = None;
+                    if **metadata == Metadata::default() {
+                        object.metadata = None;
+                    }
+                }
+            }
+            schema
+        }
+        without_title(&self.0) == without_title(&other.0)
+    }
+}
+
 impl Eq for SchemaWrapper {}
 
 impl Ord for SchemaWrapper {
@@ -608,6 +632,35 @@ impl TypeEntry {
             | TypeEntryDetails::Newtype(TypeEntryNewtype { name, .. }) => Some(name),
 
             _ => None,
+        }
+    }
+
+    /// Compare source schemas rather than finalized implementation details.
+    /// Finalization caches derived enum traits, so comparing all details can
+    /// make identical schemas appear different after an earlier addition.
+    pub(crate) fn same_named_schema(&self, other: &Self) -> bool {
+        self.extra_derives == other.extra_derives
+            && self.extra_attrs == other.extra_attrs
+            && match (&self.details, &other.details) {
+                (TypeEntryDetails::Enum(a), TypeEntryDetails::Enum(b)) => {
+                    a.schema.same_type_schema(&b.schema)
+                }
+                (TypeEntryDetails::Struct(a), TypeEntryDetails::Struct(b)) => {
+                    a.schema.same_type_schema(&b.schema)
+                }
+                (TypeEntryDetails::Newtype(a), TypeEntryDetails::Newtype(b)) => {
+                    a.schema.same_type_schema(&b.schema)
+                }
+                _ => false,
+            }
+    }
+
+    pub(crate) fn set_name(&mut self, new_name: String) {
+        match &mut self.details {
+            TypeEntryDetails::Enum(details) => details.name = new_name,
+            TypeEntryDetails::Struct(details) => details.name = new_name,
+            TypeEntryDetails::Newtype(details) => details.name = new_name,
+            _ => unreachable!("only named types can be renamed"),
         }
     }
 

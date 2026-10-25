@@ -46,7 +46,15 @@ impl TypeSpace {
 
         let non_null = non_nulls.into_iter().next()?;
 
-        let (type_entry, _) = self.convert_option(type_name, metadata, non_null).ok()?;
+        // A required name belongs to the nullable wrapper. A title on the
+        // non-null branch must not give its payload the wrapper's name.
+        let inner_type_name = match type_name {
+            Name::Required(name) => Name::Required(format!("{}Inner", name)),
+            name => name,
+        };
+        let (type_entry, _) = self
+            .convert_option(inner_type_name, metadata, non_null)
+            .ok()?;
 
         Some(type_entry)
     }

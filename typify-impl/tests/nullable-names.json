@@ -1,0 +1,55 @@
+{
+  "definitions": {
+    "aaa-wrapper": {
+      "type": "object",
+      "properties": {
+        "association": {
+          "title": "AuthorAssociation",
+          "type": "string",
+          "enum": ["OWNER", "MEMBER"]
+        },
+        "different": {
+          "title": "AuthorAssociation",
+          "type": "string",
+          "enum": ["OTHER"]
+        },
+        "reference": { "$ref": "#/definitions/author-association" }
+      },
+      "required": ["association", "different", "reference"]
+    },
+    "author-association": {
+      "title": "AuthorAssociation",
+      "type": "string",
+      "enum": ["OWNER", "MEMBER"]
+    },
+    "NullableObject": {
+      "title": "NullableObject",
+      "type": ["object", "null"],
+      "properties": { "value": { "type": "string" } },
+      "required": ["value"]
+    },
+    "OneOfEffort": {
+      "oneOf": [
+        { "type": "null" },
+        { "title": "OneOfEffort", "type": "string", "enum": ["low", "high"] }
+      ]
+    },
+    "ReasoningEffort": {
+      "anyOf": [
+        { "type": "string", "enum": ["low", "medium", "high"] },
+        { "type": "null" }
+      ]
+    },
+    "RefNullable": {
+      "anyOf": [
+        { "$ref": "#/definitions/author-association" },
+        { "type": "null" }
+      ]
+    },
+    "TitledNullableEnum": {
+      "title": "TitledNullableEnum",
+      "type": ["string", "null"],
+      "enum": ["low", "high", null]
+    }
+  }
+}

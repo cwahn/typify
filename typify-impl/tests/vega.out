@@ -12281,7 +12281,7 @@ pub enum ForceTransformForcesItem {
         )]
         distance_min: ForceTransformForcesItemDistanceMin,
         #[serde(default = "defaults::force_transform_forces_item_nbody_strength")]
-        strength: ForceTransformForcesItemStrength,
+        strength: ForceTransformForcesItemStrength2,
         #[serde(default = "defaults::force_transform_forces_item_nbody_theta")]
         theta: ForceTransformForcesItemTheta,
     },
@@ -12296,21 +12296,21 @@ pub enum ForceTransformForcesItem {
         #[serde(skip_serializing_if = "::std::option::Option::is_none")]
         links: ::std::option::Option<::std::string::String>,
         #[serde(skip_serializing_if = "::std::option::Option::is_none")]
-        strength: ::std::option::Option<ForceTransformForcesItemStrength>,
+        strength: ::std::option::Option<ForceTransformForcesItemStrength3>,
     },
     #[serde(rename = "x")]
     X {
         #[serde(default = "defaults::force_transform_forces_item_x_strength")]
-        strength: ForceTransformForcesItemStrength,
+        strength: ForceTransformForcesItemStrength4,
         #[serde(skip_serializing_if = "::std::option::Option::is_none")]
-        x: ::std::option::Option<ForceTransformForcesItemX>,
+        x: ::std::option::Option<ForceTransformForcesItemX2>,
     },
     #[serde(rename = "y")]
     Y {
         #[serde(default = "defaults::force_transform_forces_item_y_strength")]
-        strength: ForceTransformForcesItemStrength,
+        strength: ForceTransformForcesItemStrength5,
         #[serde(skip_serializing_if = "::std::option::Option::is_none")]
-        y: ::std::option::Option<ForceTransformForcesItemY>,
+        y: ::std::option::Option<ForceTransformForcesItemY2>,
     },
 }
 #[doc = "`ForceTransformForcesItemDistance`"]
@@ -12482,6 +12482,101 @@ impl ::std::convert::From<SignalRef> for ForceTransformForcesItemStrength {
         Self::SignalRef(value)
     }
 }
+#[doc = "`ForceTransformForcesItemStrength2`"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum ForceTransformForcesItemStrength2 {
+    Number(f64),
+    SignalRef(SignalRef),
+}
+impl ::std::default::Default for ForceTransformForcesItemStrength2 {
+    fn default() -> Self {
+        ForceTransformForcesItemStrength2::Number(-30_f64)
+    }
+}
+impl ::std::convert::From<f64> for ForceTransformForcesItemStrength2 {
+    fn from(value: f64) -> Self {
+        Self::Number(value)
+    }
+}
+impl ::std::convert::From<SignalRef> for ForceTransformForcesItemStrength2 {
+    fn from(value: SignalRef) -> Self {
+        Self::SignalRef(value)
+    }
+}
+#[doc = "`ForceTransformForcesItemStrength3`"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum ForceTransformForcesItemStrength3 {
+    Number(f64),
+    SignalRef(SignalRef),
+    Expr(Expr),
+    ParamField(ParamField),
+}
+impl ::std::convert::From<f64> for ForceTransformForcesItemStrength3 {
+    fn from(value: f64) -> Self {
+        Self::Number(value)
+    }
+}
+impl ::std::convert::From<SignalRef> for ForceTransformForcesItemStrength3 {
+    fn from(value: SignalRef) -> Self {
+        Self::SignalRef(value)
+    }
+}
+impl ::std::convert::From<Expr> for ForceTransformForcesItemStrength3 {
+    fn from(value: Expr) -> Self {
+        Self::Expr(value)
+    }
+}
+impl ::std::convert::From<ParamField> for ForceTransformForcesItemStrength3 {
+    fn from(value: ParamField) -> Self {
+        Self::ParamField(value)
+    }
+}
+#[doc = "`ForceTransformForcesItemStrength4`"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum ForceTransformForcesItemStrength4 {
+    Number(f64),
+    SignalRef(SignalRef),
+}
+impl ::std::default::Default for ForceTransformForcesItemStrength4 {
+    fn default() -> Self {
+        ForceTransformForcesItemStrength4::Number(0.1_f64)
+    }
+}
+impl ::std::convert::From<f64> for ForceTransformForcesItemStrength4 {
+    fn from(value: f64) -> Self {
+        Self::Number(value)
+    }
+}
+impl ::std::convert::From<SignalRef> for ForceTransformForcesItemStrength4 {
+    fn from(value: SignalRef) -> Self {
+        Self::SignalRef(value)
+    }
+}
+#[doc = "`ForceTransformForcesItemStrength5`"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum ForceTransformForcesItemStrength5 {
+    Number(f64),
+    SignalRef(SignalRef),
+}
+impl ::std::default::Default for ForceTransformForcesItemStrength5 {
+    fn default() -> Self {
+        ForceTransformForcesItemStrength5::Number(0.1_f64)
+    }
+}
+impl ::std::convert::From<f64> for ForceTransformForcesItemStrength5 {
+    fn from(value: f64) -> Self {
+        Self::Number(value)
+    }
+}
+impl ::std::convert::From<SignalRef> for ForceTransformForcesItemStrength5 {
+    fn from(value: SignalRef) -> Self {
+        Self::SignalRef(value)
+    }
+}
 #[doc = "`ForceTransformForcesItemTheta`"]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(untagged)]
@@ -12521,6 +12616,29 @@ impl ::std::convert::From<SignalRef> for ForceTransformForcesItemX {
         Self::SignalRef(value)
     }
 }
+#[doc = "`ForceTransformForcesItemX2`"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum ForceTransformForcesItemX2 {
+    ScaleField(ScaleField),
+    ParamField(ParamField),
+    Expr(Expr),
+}
+impl ::std::convert::From<ScaleField> for ForceTransformForcesItemX2 {
+    fn from(value: ScaleField) -> Self {
+        Self::ScaleField(value)
+    }
+}
+impl ::std::convert::From<ParamField> for ForceTransformForcesItemX2 {
+    fn from(value: ParamField) -> Self {
+        Self::ParamField(value)
+    }
+}
+impl ::std::convert::From<Expr> for ForceTransformForcesItemX2 {
+    fn from(value: Expr) -> Self {
+        Self::Expr(value)
+    }
+}
 #[doc = "`ForceTransformForcesItemY`"]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(untagged)]
@@ -12536,6 +12654,29 @@ impl ::std::convert::From<f64> for ForceTransformForcesItemY {
 impl ::std::convert::From<SignalRef> for ForceTransformForcesItemY {
     fn from(value: SignalRef) -> Self {
         Self::SignalRef(value)
+    }
+}
+#[doc = "`ForceTransformForcesItemY2`"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum ForceTransformForcesItemY2 {
+    ScaleField(ScaleField),
+    ParamField(ParamField),
+    Expr(Expr),
+}
+impl ::std::convert::From<ScaleField> for ForceTransformForcesItemY2 {
+    fn from(value: ScaleField) -> Self {
+        Self::ScaleField(value)
+    }
+}
+impl ::std::convert::From<ParamField> for ForceTransformForcesItemY2 {
+    fn from(value: ParamField) -> Self {
+        Self::ParamField(value)
+    }
+}
+impl ::std::convert::From<Expr> for ForceTransformForcesItemY2 {
+    fn from(value: Expr) -> Self {
+        Self::Expr(value)
     }
 }
 #[doc = "`ForceTransformIterations`"]
@@ -45498,20 +45639,20 @@ pub mod defaults {
         super::ForceTransformForcesItemDistanceMin::Number(1_f64)
     }
     pub(super) fn force_transform_forces_item_nbody_strength(
-    ) -> super::ForceTransformForcesItemStrength {
-        super::ForceTransformForcesItemStrength::Number(-30_f64)
+    ) -> super::ForceTransformForcesItemStrength2 {
+        super::ForceTransformForcesItemStrength2::Number(-30_f64)
     }
     pub(super) fn force_transform_forces_item_nbody_theta() -> super::ForceTransformForcesItemTheta
     {
         super::ForceTransformForcesItemTheta::Number(0.9_f64)
     }
-    pub(super) fn force_transform_forces_item_x_strength() -> super::ForceTransformForcesItemStrength
-    {
-        super::ForceTransformForcesItemStrength::Number(0.1_f64)
+    pub(super) fn force_transform_forces_item_x_strength(
+    ) -> super::ForceTransformForcesItemStrength4 {
+        super::ForceTransformForcesItemStrength4::Number(0.1_f64)
     }
-    pub(super) fn force_transform_forces_item_y_strength() -> super::ForceTransformForcesItemStrength
-    {
-        super::ForceTransformForcesItemStrength::Number(0.1_f64)
+    pub(super) fn force_transform_forces_item_y_strength(
+    ) -> super::ForceTransformForcesItemStrength5 {
+        super::ForceTransformForcesItemStrength5::Number(0.1_f64)
     }
     pub(super) fn geopath_transform_as() -> super::GeopathTransformAs {
         super::GeopathTransformAs::String("path".to_string())
