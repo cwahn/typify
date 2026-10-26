@@ -7,7 +7,7 @@ pub struct ObjectWithNoExtra {
 }
 impl ObjectWithNoExtra {
     pub fn builder() -> builder::ObjectWithNoExtra {
-        Default::default()
+        <builder::ObjectWithNoExtra as ::std::default::Default>::default()
     }
 }
 #[doc = "`ObjectWithOkExtra`"]
@@ -17,7 +17,7 @@ pub struct ObjectWithOkExtra {
 }
 impl ObjectWithOkExtra {
     pub fn builder() -> builder::ObjectWithOkExtra {
-        Default::default()
+        <builder::ObjectWithOkExtra as ::std::default::Default>::default()
     }
 }
 #[doc = "`ObjectWithStringExtra`"]
@@ -29,7 +29,7 @@ pub struct ObjectWithStringExtra {
 }
 impl ObjectWithStringExtra {
     pub fn builder() -> builder::ObjectWithStringExtra {
-        Default::default()
+        <builder::ObjectWithStringExtra as ::std::default::Default>::default()
     }
 }
 #[doc = "`ObjectWithWhichExtra`"]
@@ -41,7 +41,7 @@ pub struct ObjectWithWhichExtra {
 }
 impl ObjectWithWhichExtra {
     pub fn builder() -> builder::ObjectWithWhichExtra {
-        Default::default()
+        <builder::ObjectWithWhichExtra as ::std::default::Default>::default()
     }
 }
 #[doc = "`ObjectWithYesExtra`"]
@@ -51,7 +51,7 @@ pub struct ObjectWithYesExtra {
 }
 impl ObjectWithYesExtra {
     pub fn builder() -> builder::ObjectWithYesExtra {
-        Default::default()
+        <builder::ObjectWithYesExtra as ::std::default::Default>::default()
     }
 }
 #[doc = " Types for composing complex structures."]

@@ -13,9 +13,23 @@ use crate::{
     output::{OutputSpace, OutputSpaceMod},
     sanitize,
     structs::{generate_serde_attr, DefaultFunction},
-    util::{get_type_name, metadata_description, unique, TypePatch},
+    util::{get_type_name, metadata_description, render_doc_markdown, unique, TypePatch},
     Case, DefaultImpl, Name, Result, TypeId, TypeSpace, TypeSpaceImpl,
 };
+
+// Group decimal digits without changing the value or the usize suffix.
+fn readable_usize_literal(value: usize) -> proc_macro2::Literal {
+    let digits = value.to_string();
+    let mut literal = String::new();
+    for (index, digit) in digits.chars().enumerate() {
+        if index > 0 && (digits.len() - index).is_multiple_of(3) {
+            literal.push('_');
+        }
+        literal.push(digit);
+    }
+    literal.push_str("usize");
+    literal.parse().unwrap()
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct SchemaWrapper(Schema);
@@ -261,6 +275,107 @@ fn variants_unique(variants: &[Variant]) -> bool {
     )
 }
 
+/// Remove repeated enum context, not arbitrary shared character sequences.
+/// Keep established collision fallbacks and ambiguous short names unchanged.
+fn shorten_variant_names(enum_name: &str, variants: &mut [Variant]) {
+    use heck::ToSnakeCase;
+
+    if variants.len() < 2
+        || variants.iter().any(|variant| {
+            !variant.raw_name.is_ascii()
+                || variant.ident_name.as_ref() != Some(&sanitize(&variant.raw_name, Case::Pascal))
+        })
+    {
+        return;
+    }
+    let context = enum_name.to_snake_case();
+    let context = context.split('_').collect::<BTreeSet<_>>();
+    let repeated_context = |word: &str| {
+        context.contains(word)
+            || matches!(
+                word,
+                "type"
+                    | "kind"
+                    | "variant"
+                    | "item"
+                    | "value"
+                    | "data"
+                    | "content"
+                    | "param"
+                    | "parameter"
+                    | "connector"
+            )
+    };
+    let words = variants
+        .iter()
+        .map(|variant| {
+            variant
+                .ident_name
+                .as_ref()
+                .unwrap()
+                .to_snake_case()
+                .split('_')
+                .filter(|word| !word.is_empty())
+                .map(str::to_string)
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+    let first = &words[0];
+    let prefix = (0..first.len())
+        .take_while(|&index| words.iter().all(|name| name.get(index) == first.get(index)))
+        .count();
+    let suffix = (0..first.len())
+        .take_while(|&index| {
+            words.iter().all(|name| {
+                name.len() > index && name[name.len() - 1 - index] == first[first.len() - 1 - index]
+            })
+        })
+        .count();
+    let prefix = if first[..prefix].iter().any(|word| repeated_context(word)) {
+        prefix
+    } else {
+        0
+    };
+    let suffix = if first[first.len() - suffix..]
+        .iter()
+        .any(|word| repeated_context(word))
+    {
+        suffix
+    } else {
+        0
+    };
+    if prefix + suffix == 0 || words.iter().any(|name| name.len() <= prefix + suffix) {
+        return;
+    }
+    let candidates = words
+        .iter()
+        .map(|name| {
+            let remaining = &name[prefix..name.len() - suffix];
+            // A bare letter, number, or structural placeholder loses useful meaning.
+            if !remaining.iter().any(|word| {
+                word.len() > 1
+                    && word.chars().any(char::is_alphabetic)
+                    && !matches!(
+                        word.as_str(),
+                        "type" | "kind" | "variant" | "item" | "value" | "data"
+                    )
+            }) {
+                return None;
+            }
+            Some(sanitize(&remaining.join("_"), Case::Pascal))
+        })
+        .collect::<Option<Vec<_>>>();
+    let Some(candidates) = candidates else {
+        return;
+    };
+    if !unique(candidates.iter()) {
+        return;
+    }
+    for (variant, name) in variants.iter_mut().zip(candidates) {
+        variant.ident_name = Some(name);
+    }
+}
+
 impl TypeEntryEnum {
     pub(crate) fn from_metadata(
         type_space: &TypeSpace,
@@ -352,6 +467,7 @@ impl TypeEntryEnum {
         }
 
         let name = get_type_name(&type_name, metadata).unwrap();
+        shorten_variant_names(&name, &mut variants);
         let rename = None;
         let description = metadata_description(metadata);
 
@@ -913,9 +1029,31 @@ impl TypeEntry {
 
         let type_name = format_ident!("{}", name);
 
+        let default_stream = default
+            .as_ref()
+            .map(|value| self.output_value_for_self(type_space, &value.0).unwrap());
+        // Reuse the validated value's selected constructor, including serde tag
+        // and rename handling. Only a unit variant can carry #[default].
+        let default_variant = default_stream
+            .as_ref()
+            .and_then(|stream| self.unit_variant_for_value(stream));
+        if default_variant.is_some() {
+            derive_set.insert("Default");
+        }
+
         let variants_decl = variants
             .iter()
-            .map(|variant| output_variant(variant, type_space, output, name))
+            .map(|variant| {
+                let declaration = output_variant(variant, type_space, output, name);
+                let is_default = default_variant
+                    .as_ref()
+                    .is_some_and(|name| variant.ident_name.as_ref() == Some(name));
+                if is_default {
+                    quote! { #[default] #declaration }
+                } else {
+                    declaration
+                }
+            })
             .collect::<Vec<_>>();
 
         // It should not be possible to construct an untagged enum
@@ -985,16 +1123,18 @@ impl TypeEntry {
                 }
             });
 
-        let default_impl = default.as_ref().map(|value| {
-            let default_stream = self.output_value(type_space, &value.0, &quote! {}).unwrap();
-            quote! {
-                impl ::std::default::Default for #type_name {
-                    fn default() -> Self {
-                        #default_stream
+        let default_impl =
+            default_stream
+                .filter(|_| default_variant.is_none())
+                .map(|default_stream| {
+                    quote! {
+                        impl ::std::default::Default for #type_name {
+                            fn default() -> Self {
+                                #default_stream
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
 
         let untagged_newtype_from_string_impl = bespoke_impls
             .contains(&TypeEntryEnumImpl::UntaggedFromStr)
@@ -1002,6 +1142,16 @@ impl TypeEntry {
                 let variant_name = variants
                     .iter()
                     .map(|variant| format_ident!("{}", variant.ident_name.as_ref().unwrap()));
+                let variant_type = variants.iter().map(|variant| {
+                    let VariantDetails::Item(id) = &variant.details else {
+                        unreachable!()
+                    };
+                    type_space
+                        .id_to_entry
+                        .get(id)
+                        .unwrap()
+                        .type_ident(type_space, &None)
+                });
 
                 quote! {
                     impl ::std::str::FromStr for #type_name {
@@ -1012,7 +1162,7 @@ impl TypeEntry {
                         {
                             #(
                                 // Try to parse() into each variant.
-                                if let Ok(v) = value.parse() {
+                                if let Ok(v) = value.parse::<#variant_type>() {
                                     Ok(Self::#variant_name(v))
                                 } else
                             )*
@@ -1190,7 +1340,7 @@ impl TypeEntry {
     ) {
         enum PropDefault {
             None(String),
-            Default(TokenStream),
+            Default,
             Custom(TokenStream),
         }
 
@@ -1228,7 +1378,10 @@ impl TypeEntry {
         let mut prop_type_scoped = Vec::new();
 
         properties.iter().for_each(|prop| {
-            prop_doc.push(prop.description.as_ref().map(|d| quote! { #[doc = #d] }));
+            prop_doc.push(prop.description.as_ref().map(|description| {
+                let description = render_doc_markdown(description);
+                quote! { #[doc = #description] }
+            }));
             prop_name.push(format_ident!("{}", prop.name));
             prop_error.push(format!(
                 "error converting supplied value for {}: {{e}}",
@@ -1252,9 +1405,7 @@ impl TypeEntry {
 
             prop_serde.push(serde);
             prop_default.push(match default_fn {
-                DefaultFunction::Default => PropDefault::Default(quote! {
-                    Default::default()
-                }),
+                DefaultFunction::Default => PropDefault::Default,
                 DefaultFunction::Custom(fn_name) => {
                     let default_fn = syn::parse_str::<Path>(&fn_name).unwrap();
                     PropDefault::Custom(quote! {
@@ -1276,7 +1427,7 @@ impl TypeEntry {
         let derive_default = default.is_none()
             && prop_default
                 .iter()
-                .all(|pd| matches!(pd, PropDefault::Default(_)));
+                .all(|pd| matches!(pd, PropDefault::Default));
         if derive_default {
             derive_set.insert("Default");
         }
@@ -1309,7 +1460,7 @@ impl TypeEntry {
 
         // If there's a default value, generate an impl Default
         if let Some(value) = default {
-            let default_stream = self.output_value(type_space, &value.0, &quote! {}).unwrap();
+            let default_stream = self.output_value_for_self(type_space, &value.0).unwrap();
             output.add_item(
                 OutputSpaceMod::Crate,
                 name,
@@ -1325,11 +1476,11 @@ impl TypeEntry {
             // Handled above via `#[derive(Default)]`.
         } else if let Some(prop_default) = prop_default
             .iter()
-            .map(|pd| match pd {
+            .zip(&prop_type)
+            .map(|(pd, ty)| match pd {
                 PropDefault::None(_) => None,
-                PropDefault::Default(token_stream) | PropDefault::Custom(token_stream) => {
-                    Some(token_stream)
-                }
+                PropDefault::Default => Some(quote! { <#ty>::default() }),
+                PropDefault::Custom(token_stream) => Some(token_stream.clone()),
             })
             .collect::<Option<Vec<_>>>()
         {
@@ -1358,7 +1509,7 @@ impl TypeEntry {
                 quote! {
                     impl #type_name {
                         pub fn builder() -> builder::#type_name {
-                            Default::default()
+                            <builder::#type_name as ::std::default::Default>::default()
                         }
                     }
                 },
@@ -1372,11 +1523,15 @@ impl TypeEntry {
                 quote! { value }
             };
 
-            let prop_default = prop_default.iter().map(|pd| match pd {
-                PropDefault::None(err_msg) => quote! { Err(#err_msg.to_string()) },
-                PropDefault::Default(default_fn) => quote! { Ok(#default_fn) },
-                PropDefault::Custom(custom_fn) => quote! { Ok(super::#custom_fn) },
-            });
+            let prop_default =
+                prop_default
+                    .iter()
+                    .zip(&prop_type_scoped)
+                    .map(|(pd, ty)| match pd {
+                        PropDefault::None(err_msg) => quote! { Err(#err_msg.to_string()) },
+                        PropDefault::Default => quote! { Ok(<#ty>::default()) },
+                        PropDefault::Custom(custom_fn) => quote! { Ok(super::#custom_fn) },
+                    });
 
             output.add_item(
                 OutputSpaceMod::Builder,
@@ -1466,6 +1621,45 @@ impl TypeEntry {
         let type_name = format_ident!("{}", name);
         let inner_type = type_space.id_to_entry.get(type_id).unwrap();
         let inner_type_name = inner_type.type_ident(type_space, &None);
+
+        // Generalize only the conversion destination, not the stored/public
+        // newtype. Other hasher choices require re-collecting the same entries.
+        let std_hash_map = matches!(&type_space.settings.map_type.0,
+            syn::Type::Path(path) if path.path.segments.iter().map(|part| part.ident.to_string()).collect::<Vec<_>>() == ["std", "collections", "HashMap"]);
+        let (map_entry, optional_map) = match &inner_type.details {
+            TypeEntryDetails::Option(id) => (type_space.id_to_entry.get(id).unwrap(), true),
+            _ => (inner_type, false),
+        };
+        let generalized_map = match &map_entry.details {
+            TypeEntryDetails::Map(key_id, value_id) if std_hash_map => {
+                let key = type_space.id_to_entry.get(key_id).unwrap();
+                let value = type_space.id_to_entry.get(value_id).unwrap();
+                // This pair is emitted as serde_json::Map, not HashMap.
+                (!(key.details == TypeEntryDetails::String
+                    && value.details == TypeEntryDetails::JsonValue))
+                    .then(|| {
+                        let key = key.type_ident(type_space, &None);
+                        let value = value.type_ident(type_space, &None);
+                        quote! { ::std::collections::HashMap<#key, #value, __TypifyBuildHasher> }
+                    })
+            }
+            _ => None,
+        };
+        let (reverse_generics, reverse_target, reverse_value) = match generalized_map {
+            Some(map) => {
+                let generics = quote! { <__TypifyBuildHasher: ::std::hash::BuildHasher + ::std::default::Default> };
+                if optional_map {
+                    (
+                        generics,
+                        quote! { ::std::option::Option<#map> },
+                        quote! { value.0.map(|map| map.into_iter().collect()) },
+                    )
+                } else {
+                    (generics, map, quote! { value.0.into_iter().collect() })
+                }
+            }
+            None => (quote! {}, inner_type_name.clone(), quote! { value.0 }),
+        };
 
         let is_str = matches!(inner_type.details, TypeEntryDetails::String);
 
@@ -1602,7 +1796,7 @@ impl TypeEntry {
                                     enum_values: ::std::option::Option::Some([
                                         #( ::serde_json::from_str(#value_string).unwrap(), )*
                                     ].into_iter().collect()),
-                                    ..::std::default::Default::default()
+                                    ..::schemars::schema::SchemaObject::default()
                                 };
                                 schema.subschemas().not = Some(
                                     ::std::boxed::Box::new(not.into())
@@ -1689,6 +1883,7 @@ impl TypeEntry {
                 let max = max_length.map(|v| {
                     let v = v as usize;
                     let err = format!("longer than {} characters", v);
+                    let v = readable_usize_literal(v);
                     quote! {
                         if value.chars().count() > #v {
                             return Err(#err.into());
@@ -1698,6 +1893,7 @@ impl TypeEntry {
                 let min = min_length.map(|v| {
                     let v = v as usize;
                     let err = format!("shorter than {} characters", v);
+                    let v = readable_usize_literal(v);
                     quote! {
                         if value.chars().count() < #v {
                             return Err(#err.into());
@@ -1705,17 +1901,20 @@ impl TypeEntry {
                     }
                 });
 
-                let pat = pattern.as_ref().map(|p| {
+                let (pat_decl, pat_check) = pattern.as_ref().map(|p| {
                     let err = format!("doesn't match pattern \"{}\"", p);
-                    quote! {
+                    let declaration = quote! {
                         static PATTERN: ::std::sync::LazyLock<::regress::Regex> = ::std::sync::LazyLock::new(|| {
                             ::regress::Regex::new(#p).unwrap()
                         });
+                    };
+                    let check = quote! {
                         if PATTERN.find(value).is_none() {
                             return Err(#err.into());
                         }
-                    }
-                });
+                    };
+                    (declaration, check)
+                }).unzip();
 
                 // We're going to impl Deserialize so we can remove it
                 // from the set of derived impls.
@@ -1728,9 +1927,10 @@ impl TypeEntry {
                         type Err = self::error::ConversionError;
 
                         fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+                            #pat_decl
                             #max
                             #min
-                            #pat
+                            #pat_check
 
                             Ok(Self(value.to_string()))
                         }
@@ -1781,7 +1981,7 @@ impl TypeEntry {
         };
 
         let default_impl = default.as_ref().map(|value| {
-            let default_stream = self.output_value(type_space, &value.0, &quote! {}).unwrap();
+            let default_stream = self.output_value_for_self(type_space, &value.0).unwrap();
             quote! {
                 impl ::std::default::Default for #type_name {
                     fn default() -> Self {
@@ -1812,9 +2012,9 @@ impl TypeEntry {
                 }
             }
 
-            impl ::std::convert::From<#type_name> for #inner_type_name {
+            impl #reverse_generics ::std::convert::From<#type_name> for #reverse_target {
                 fn from(value: #type_name) -> Self {
-                    value.0
+                    #reverse_value
                 }
             }
 
@@ -1822,6 +2022,26 @@ impl TypeEntry {
             #constraint_impl
         };
         output.add_item(OutputSpaceMod::Crate, name, item);
+    }
+
+    /// Identify a unit variant in an already rendered, validated enum value.
+    /// Payload constructors must retain their explicit default implementation.
+    pub(crate) fn unit_variant_for_value(&self, value: &TokenStream) -> Option<String> {
+        let TypeEntryDetails::Enum(details) = &self.details else {
+            return None;
+        };
+        let syn::Expr::Path(path) = syn::parse2::<syn::Expr>(value.clone()).unwrap() else {
+            return None;
+        };
+        if path.qself.is_some() || path.path.segments.len() < 2 {
+            return None;
+        }
+        let name = path.path.segments.last().unwrap().ident.to_string();
+        details.variants.iter().find_map(|variant| {
+            (matches!(variant.details, VariantDetails::Simple)
+                && variant.ident_name.as_ref() == Some(&name))
+            .then(|| name.clone())
+        })
     }
 
     pub(crate) fn type_name(&self, type_space: &TypeSpace) -> String {
@@ -1833,28 +2053,36 @@ impl TypeEntry {
         type_space: &TypeSpace,
         type_mod: &Option<String>,
     ) -> TokenStream {
+        let scope = type_mod
+            .as_ref()
+            .map(|name| {
+                let ident = format_ident!("{}", name);
+                quote! { #ident:: }
+            })
+            .unwrap_or_default();
+        self.type_ident_in_scope(type_space, &scope)
+    }
+
+    pub(crate) fn type_ident_in_scope(
+        &self,
+        type_space: &TypeSpace,
+        scope: &TokenStream,
+    ) -> TokenStream {
         match &self.details {
             // Named types.
             TypeEntryDetails::Enum(TypeEntryEnum { name, .. })
             | TypeEntryDetails::Struct(TypeEntryStruct { name, .. })
-            | TypeEntryDetails::Newtype(TypeEntryNewtype { name, .. }) => match &type_mod {
-                Some(type_mod) => {
-                    let type_mod = format_ident!("{}", type_mod);
-                    let type_name = format_ident!("{}", name);
-                    quote! { #type_mod :: #type_name }
-                }
-                None => {
-                    let type_name = format_ident!("{}", name);
-                    quote! { #type_name }
-                }
-            },
+            | TypeEntryDetails::Newtype(TypeEntryNewtype { name, .. }) => {
+                let type_name = format_ident!("{}", name);
+                quote! { #scope #type_name }
+            }
 
             TypeEntryDetails::Option(id) => {
                 let inner_ty = type_space
                     .id_to_entry
                     .get(id)
                     .expect("unresolved type id for option");
-                let inner_ident = inner_ty.type_ident(type_space, type_mod);
+                let inner_ident = inner_ty.type_ident_in_scope(type_space, scope);
 
                 // Flatten nested Option types. This would only happen if the
                 // schema encoded it; it's an odd construction.
@@ -1870,7 +2098,7 @@ impl TypeEntry {
                     .get(id)
                     .expect("unresolved type id for box");
 
-                let item = inner_ty.type_ident(type_space, type_mod);
+                let item = inner_ty.type_ident_in_scope(type_space, scope);
 
                 quote! { ::std::boxed::Box<#item> }
             }
@@ -1880,7 +2108,7 @@ impl TypeEntry {
                     .id_to_entry
                     .get(id)
                     .expect("unresolved type id for array");
-                let item = inner_ty.type_ident(type_space, type_mod);
+                let item = inner_ty.type_ident_in_scope(type_space, scope);
 
                 quote! { ::std::vec::Vec<#item> }
             }
@@ -1903,8 +2131,8 @@ impl TypeEntry {
                         ::serde_json::Map<::std::string::String, ::serde_json::Value>
                     }
                 } else {
-                    let key_ident = key_ty.type_ident(type_space, type_mod);
-                    let value_ident = value_ty.type_ident(type_space, type_mod);
+                    let key_ident = key_ty.type_ident_in_scope(type_space, scope);
+                    let value_ident = value_ty.type_ident_in_scope(type_space, scope);
                     let map_to_use = &map_to_use.0;
 
                     quote! { #map_to_use<#key_ident, #value_ident> }
@@ -1916,7 +2144,7 @@ impl TypeEntry {
                     .id_to_entry
                     .get(id)
                     .expect("unresolved type id for set");
-                let item = inner_ty.type_ident(type_space, type_mod);
+                let item = inner_ty.type_ident_in_scope(type_space, scope);
                 // TODO we'll want this to be a Set of some kind, but we need
                 // to get the derives right first.
                 quote! { ::std::vec::Vec<#item> }
@@ -1928,7 +2156,7 @@ impl TypeEntry {
                         .id_to_entry
                         .get(item)
                         .expect("unresolved type id for tuple")
-                        .type_ident(type_space, type_mod)
+                        .type_ident_in_scope(type_space, scope)
                 });
 
                 if items.len() != 1 {
@@ -1944,7 +2172,7 @@ impl TypeEntry {
                     .id_to_entry
                     .get(item_id)
                     .expect("unresolved type id for array");
-                let item_ident = item_ty.type_ident(type_space, type_mod);
+                let item_ident = item_ty.type_ident_in_scope(type_space, scope);
 
                 quote! { [#item_ident; #length]}
             }
@@ -1963,7 +2191,7 @@ impl TypeEntry {
                             .id_to_entry
                             .get(type_id)
                             .expect("unresolved type id for tuple")
-                            .type_ident(type_space, type_mod)
+                            .type_ident_in_scope(type_space, scope)
                     });
                     quote! { < #(#type_idents,)* > }
                 });
@@ -2122,8 +2350,8 @@ impl TypeEntry {
 
 fn make_doc(name: &str, description: Option<&String>) -> TokenStream {
     let desc = match description {
-        Some(desc) => desc,
-        None => &format!("`{}`", name),
+        Some(desc) => render_doc_markdown(desc),
+        None => format!("`{}`", name),
     };
 
     quote! { #[doc = #desc] }
@@ -2223,10 +2451,56 @@ mod tests {
         Name, TypeEntryDetails, TypeSpace,
     };
 
+    #[test]
+    fn readable_usize_literals_preserve_values() {
+        for value in [0, 999, 1_000, 10_485_760, usize::MAX] {
+            let literal = super::readable_usize_literal(value).to_string();
+            assert_eq!(
+                literal
+                    .strip_suffix("usize")
+                    .unwrap()
+                    .replace('_', "")
+                    .parse::<usize>()
+                    .unwrap(),
+                value
+            );
+        }
+        assert_eq!(
+            super::readable_usize_literal(10_485_760).to_string(),
+            "10_485_760usize"
+        );
+    }
+
+    #[test]
+    fn builder_emission_follows_global_setting() {
+        for global_builder in [false, true] {
+            let mut settings = crate::TypeSpaceSettings::default();
+            settings.with_struct_builder(global_builder);
+            let mut space = TypeSpace::new(&settings);
+            let schema = serde_json::from_value(serde_json::json!({
+                "title": "Request", "type": "object",
+                "properties": { "body": { "type": "string" } }, "required": ["body"]
+            }))
+            .unwrap();
+            let id = space.add_root_schema(schema).unwrap().unwrap();
+            let entry = space.id_to_entry.get(&id).unwrap();
+            let mut output = crate::output::OutputSpace::default();
+            entry.output(&space, &mut output);
+            assert_eq!(
+                output.into_stream().to_string().contains("pub mod builder"),
+                global_builder
+            );
+        }
+    }
+
     fn variant_names(values: &[&str]) -> BTreeMap<String, String> {
+        named_variant_names("Example", values)
+    }
+
+    fn named_variant_names(name: &str, values: &[&str]) -> BTreeMap<String, String> {
         let entry = TypeEntryEnum::from_metadata(
             &TypeSpace::default(),
-            Name::Required("Example".to_string()),
+            Name::Required(name.to_string()),
             &None,
             EnumTagType::External,
             values
@@ -2244,6 +2518,64 @@ mod tests {
             .into_iter()
             .map(|variant| (variant.raw_name, variant.ident_name.unwrap()))
             .collect()
+    }
+
+    #[test]
+    fn redundant_enum_context_is_shortened_at_word_boundaries() {
+        for (name, raw, expected) in [
+            (
+                "ApplyPatchOperation",
+                ["CreateFileOperation", "DeleteFileOperation"],
+                ["Create", "Delete"],
+            ),
+            (
+                "TransferState",
+                ["TransferStateQueued", "TransferStateRunning"],
+                ["Queued", "Running"],
+            ),
+            (
+                "JobStatus",
+                ["JobQueuedStatus", "JobDoneStatus"],
+                ["Queued", "Done"],
+            ),
+            (
+                "KeywordOperation",
+                ["OperationSelf", "OperationOther"],
+                ["Self_", "Other"],
+            ),
+        ] {
+            let actual = named_variant_names(name, &raw);
+            for (raw, expected) in raw.into_iter().zip(expected) {
+                assert_eq!(actual[raw], expected, "{name}");
+            }
+            assert_eq!(actual, named_variant_names(name, &[raw[1], raw[0]]));
+        }
+    }
+
+    #[test]
+    fn ambiguous_enum_names_and_existing_fallbacks_are_not_shortened() {
+        for (name, raw) in [
+            ("AccessMode", ["ReadOnly", "ReadWrite"]),
+            ("Run", ["Runner", "Running"]),
+            ("FlagMode", ["FlagModeA", "FlagModeB"]),
+            ("WholeMode", ["WholeMode", "WholeModeOther"]),
+            ("Operation", ["OperationItem", "OperationValue"]),
+        ] {
+            let actual = named_variant_names(name, &raw);
+            for raw in raw {
+                assert_eq!(actual[raw], raw, "{name}");
+            }
+        }
+        for raw in [
+            vec!["OperationSelf", "OperationSelf_"],
+            vec!["🔥Operation", "🚀Operation"],
+        ] {
+            assert_eq!(named_variant_names("Operation", &raw), variant_names(&raw));
+        }
+        assert_eq!(
+            named_variant_names("Operation", &["OnlyOperation"])["OnlyOperation"],
+            "OnlyOperation"
+        );
     }
 
     #[test]

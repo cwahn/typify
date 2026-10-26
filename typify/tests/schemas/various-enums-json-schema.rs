@@ -6,6 +6,7 @@
     Clone,
     Copy,
     Debug,
+    Default,
     Eq,
     Hash,
     Ord,
@@ -15,6 +16,7 @@
 )]
 pub enum AlternativeEnum {
     Choice1,
+    #[default]
     Choice2,
     Choice3,
 }
@@ -50,11 +52,6 @@ impl ::std::convert::TryFrom<::std::string::String> for AlternativeEnum {
         value: ::std::string::String,
     ) -> ::std::result::Result<Self, self::error::ConversionError> {
         value.parse()
-    }
-}
-impl ::std::default::Default for AlternativeEnum {
-    fn default() -> Self {
-        AlternativeEnum::Choice2
     }
 }
 #[doc = "`AnyOfNoStrings`"]
@@ -205,7 +202,7 @@ pub struct DiskAttachment {
 }
 impl DiskAttachment {
     pub fn builder() -> builder::DiskAttachment {
-        Default::default()
+        <builder::DiskAttachment as ::std::default::Default>::default()
     }
 }
 #[doc = "`DiskAttachmentState`"]
@@ -215,6 +212,7 @@ impl DiskAttachment {
     Clone,
     Copy,
     Debug,
+    Default,
     Eq,
     Hash,
     Ord,
@@ -223,6 +221,7 @@ impl DiskAttachment {
     schemars :: JsonSchema,
 )]
 pub enum DiskAttachmentState {
+    #[default]
     Detached,
     Destroyed,
     Faulted,
@@ -261,11 +260,6 @@ impl ::std::convert::TryFrom<::std::string::String> for DiskAttachmentState {
         value.parse()
     }
 }
-impl ::std::default::Default for DiskAttachmentState {
-    fn default() -> Self {
-        DiskAttachmentState::Detached
-    }
-}
 #[doc = "`EmptyObject`"]
 #[derive(
     :: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, Default, schemars :: JsonSchema,
@@ -276,7 +270,7 @@ pub struct EmptyObject {
 }
 impl EmptyObject {
     pub fn builder() -> builder::EmptyObject {
-        Default::default()
+        <builder::EmptyObject as ::std::default::Default>::default()
     }
 }
 #[doc = "`EmptyObjectProp`"]
@@ -367,9 +361,9 @@ impl ::std::fmt::Display for IpNet {
 impl ::std::str::FromStr for IpNet {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<Ipv4Net>() {
             Ok(Self::V4(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<Ipv6Net>() {
             Ok(Self::V6(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -644,7 +638,7 @@ impl ::schemars::JsonSchema for NotBlockSize {
                 .into_iter()
                 .collect(),
             ),
-            ..::std::default::Default::default()
+            ..::schemars::schema::SchemaObject::default()
         };
         schema.subschemas().not = Some(::std::boxed::Box::new(not.into()));
         schema.into()
@@ -1163,7 +1157,7 @@ pub mod builder {
     impl ::std::default::Default for EmptyObject {
         fn default() -> Self {
             Self {
-                prop: Ok(Default::default()),
+                prop: Ok(<::std::option::Option<super::EmptyObjectProp>>::default()),
             }
         }
     }

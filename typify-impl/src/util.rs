@@ -4,6 +4,7 @@ use std::collections::{BTreeMap, BTreeSet, HashSet};
 
 use heck::ToPascalCase;
 use log::debug;
+use pulldown_cmark::{Event, Parser, Tag, TagEnd};
 use schemars::schema::{
     ArrayValidation, InstanceType, Metadata, ObjectValidation, Schema, SchemaObject, SingleOrVec,
     StringValidation, SubschemaValidation,
@@ -33,6 +34,348 @@ pub(crate) fn metadata_title_and_description(metadata: &Option<Box<Metadata>>) -
             (None, Some(d)) => Some(d.clone()),
             (None, None) => None,
         })
+}
+
+/// Format Markdown descriptions for emission as Rust documentation.
+///
+/// Call this at the documentation-emission boundary, never on stored metadata,
+/// naming inputs, or schema JSON. It adds inline-code styling to code-like
+/// identifiers, indents lazy list continuations, and wraps unambiguous bare
+/// HTTP(S) URLs in Markdown autolinks without changing their text or destination.
+///
+/// Source-range edits preserve existing code, links, HTML, escapes, tables and
+/// footnote definitions. URL tokens with ambiguous punctuation, non-ASCII text,
+/// or unsupported authority syntax are left unchanged. Tab-based and quoted
+/// list continuations are not normalized. If edits would change parsed display
+/// beyond inline-code styling and visible-URL autolinks, the input is returned
+/// unchanged. No Markdown is globally reserialized.
+///
+/// # Examples
+///
+/// ```
+/// assert_eq!(
+///     typify_impl::render_doc_markdown("Use snake_case. See https://example.org/docs"),
+///     "Use `snake_case`. See <https://example.org/docs>",
+/// );
+/// ```
+pub fn render_doc_markdown(description: &str) -> String {
+    let mut insertions = BTreeMap::<usize, String>::new();
+    let mut items = Vec::new();
+    let mut code_depth = 0;
+    let mut link_depth = 0;
+    let mut quote_depth = 0;
+    let mut html_elements = Vec::new();
+    let mut verbatim_depth = 0;
+
+    for (event, range) in doc_markdown_parser(description).into_offset_iter() {
+        match event {
+            Event::Start(Tag::Table(_) | Tag::FootnoteDefinition(_)) => verbatim_depth += 1,
+            Event::End(TagEnd::Table | TagEnd::FootnoteDefinition) => verbatim_depth -= 1,
+            // Pipes can occur inside a text event but still delimit cells in
+            // rustdoc. Footnote definitions can also be link definitions when
+            // extensions are disabled. Preserve both forms' source verbatim.
+            _ if verbatim_depth > 0 => (),
+            Event::Start(Tag::CodeBlock(_)) => code_depth += 1,
+            Event::End(TagEnd::CodeBlock) => code_depth -= 1,
+            Event::Start(Tag::Link { .. } | Tag::Image { .. }) => link_depth += 1,
+            Event::End(TagEnd::Link | TagEnd::Image) => link_depth -= 1,
+            Event::Start(Tag::BlockQuote(_)) => quote_depth += 1,
+            Event::End(TagEnd::BlockQuote(_)) => quote_depth -= 1,
+            Event::Start(Tag::Item) => {
+                let line_start = description[..range.start].rfind('\n').map_or(0, |i| i + 1);
+                let marker = &description[range.start..range.end];
+                let marker_len = if marker.starts_with(['-', '*', '+']) {
+                    1
+                } else {
+                    marker.bytes().take_while(u8::is_ascii_digit).count() + 1
+                };
+                let spaces = marker[marker_len..]
+                    .bytes()
+                    .take_while(|b| *b == b' ')
+                    .count();
+                // Tabs and blockquote prefixes need container-aware column
+                // handling; leave these uncommon cases unchanged.
+                let prefix = &description[line_start..range.start];
+                let indent = (prefix.bytes().all(|b| b == b' ') && (1..=4).contains(&spaces))
+                    .then_some(prefix.len() + marker_len + spaces);
+                items.push(indent);
+            }
+            Event::End(TagEnd::Item) => {
+                items.pop();
+            }
+            Event::InlineHtml(html) => {
+                // Unlike HTML blocks, inline HTML has no parser container
+                // events. Protect text inside raw elements, especially <code>.
+                let tag = html.strip_prefix('<').unwrap_or("");
+                let closing = tag.starts_with('/');
+                let tag = tag.trim_start_matches('/');
+                let name = tag
+                    .split(|c: char| !c.is_ascii_alphanumeric() && c != '-')
+                    .next()
+                    .unwrap_or("")
+                    .to_ascii_lowercase();
+                if !name.is_empty() {
+                    if closing {
+                        if let Some(index) = html_elements.iter().rposition(|n| *n == name) {
+                            html_elements.truncate(index);
+                        }
+                    } else if !html.ends_with("/>")
+                        && !matches!(
+                            name.as_str(),
+                            "area"
+                                | "base"
+                                | "br"
+                                | "col"
+                                | "embed"
+                                | "hr"
+                                | "img"
+                                | "input"
+                                | "link"
+                                | "meta"
+                                | "param"
+                                | "source"
+                                | "track"
+                                | "wbr"
+                        )
+                    {
+                        html_elements.push(name);
+                    }
+                }
+            }
+            Event::SoftBreak | Event::HardBreak
+                if code_depth == 0 && quote_depth == 0 && html_elements.is_empty() =>
+            {
+                if let Some(Some(indent)) = items.last() {
+                    if let Some(newline) = description[range.clone()].rfind('\n') {
+                        let start = range.start + newline + 1;
+                        let line = description[start..].split('\n').next().unwrap_or("");
+                        let spaces = line.bytes().take_while(|b| *b == b' ').count();
+                        if spaces < *indent && !line[spaces..].starts_with(['\t', '\r']) {
+                            insertions.insert(start, " ".repeat(indent - spaces));
+                        }
+                    }
+                }
+            }
+            Event::Text(text)
+                if code_depth == 0
+                    && link_depth == 0
+                    && quote_depth == 0
+                    && html_elements.is_empty()
+                    && description[range.clone()] == *text =>
+            {
+                for url in text.split_whitespace().filter(|word| doc_bare_url(word)) {
+                    let start = range.start + url.as_ptr() as usize - text.as_ptr() as usize;
+                    let end = start + url.len();
+                    // Require a complete source token within this unformatted
+                    // Text event, never a fragment split by escapes, Markdown,
+                    // apostrophes or smart punctuation.
+                    if description[..start]
+                        .chars()
+                        .next_back()
+                        .is_none_or(char::is_whitespace)
+                        && description[end..]
+                            .chars()
+                            .next()
+                            .is_none_or(char::is_whitespace)
+                    {
+                        insertions.entry(start).or_default().push('<');
+                        insertions.entry(end).or_default().push('>');
+                    }
+                }
+                for original in text.split(|c: char| c.is_whitespace() || c == '\'') {
+                    let trim = |c: char| !c.is_alphanumeric() && c != ':';
+                    let mut word = original.trim_end_matches(trim);
+                    if original
+                        .get(..word.len() + 2)
+                        .is_some_and(|s| s.ends_with("()"))
+                    {
+                        word = &original[..word.len() + 2];
+                    }
+                    word = word.trim_start_matches(trim);
+                    if !word.starts_with("::") {
+                        word = word.trim_start_matches(':');
+                    }
+                    if !word.ends_with("::") {
+                        word = word.trim_end_matches(':');
+                    }
+                    if doc_word_needs_code(word) {
+                        let offset = word.as_ptr() as usize - text.as_ptr() as usize;
+                        let source_offset = range.start + offset;
+                        // Apostrophes and smart punctuation may split a valid
+                        // URL across words or parser events. Inspect its whole
+                        // source token before formatting any fragment of it.
+                        let before = description[..source_offset]
+                            .rsplit(char::is_whitespace)
+                            .next()
+                            .unwrap_or("");
+                        let after = description[source_offset..]
+                            .split(char::is_whitespace)
+                            .next()
+                            .unwrap_or("");
+                        let token =
+                            &description[source_offset - before.len()..source_offset + after.len()];
+                        if doc_word_is_uri(token.trim_start_matches(trim)) {
+                            continue;
+                        }
+                        insertions
+                            .entry(range.start + offset)
+                            .or_default()
+                            .push('`');
+                        insertions
+                            .entry(range.start + offset + word.len())
+                            .or_default()
+                            .push('`');
+                    }
+                }
+            }
+            _ => (),
+        }
+    }
+
+    let mut rendered = String::with_capacity(description.len());
+    let mut previous = 0;
+    for (offset, insertion) in insertions {
+        rendered.push_str(&description[previous..offset]);
+        rendered.push_str(&insertion);
+        previous = offset;
+    }
+    rendered.push_str(&description[previous..]);
+    if rendered != description && doc_display_events(&rendered) != doc_display_events(description) {
+        description.to_string()
+    } else {
+        rendered
+    }
+}
+
+fn doc_markdown_parser(markdown: &str) -> Parser<'_> {
+    use pulldown_cmark::Options;
+
+    // Match Rust 1.95 rustdoc's rendering extensions, including compact tables.
+    Parser::new_ext(
+        markdown,
+        Options::ENABLE_TABLES
+            | Options::ENABLE_FOOTNOTES
+            | Options::ENABLE_STRIKETHROUGH
+            | Options::ENABLE_TASKLISTS
+            | Options::ENABLE_SMART_PUNCTUATION,
+    )
+}
+
+fn doc_display_events(markdown: &str) -> Vec<Event<'static>> {
+    // Inline-code styling and canonical visible-URL autolinks are intentional.
+    // Decoded text, block structure, HTML and other links must be identical.
+    let mut events = Vec::new();
+    let mut text = String::new();
+    let mut visible_url_link = false;
+    for (event, range) in doc_markdown_parser(markdown).into_offset_iter() {
+        match event {
+            Event::Start(Tag::Link {
+                link_type: pulldown_cmark::LinkType::Autolink,
+                ref dest_url,
+                ..
+            }) if doc_bare_url(dest_url) && markdown[range] == format!("<{dest_url}>") => {
+                // Canonical HTTP(S) autolinks display their exact destination.
+                // Do not erase ordinary link structure or independently chosen
+                // labels/targets: only this visible-URL wrapper is permitted.
+                visible_url_link = true;
+            }
+            Event::End(TagEnd::Link) if visible_url_link => visible_url_link = false,
+            Event::Text(part) | Event::Code(part) => text.push_str(&part),
+            event => {
+                if !text.is_empty() {
+                    events.push(Event::Text(std::mem::take(&mut text).into()));
+                }
+                events.push(event.into_static());
+            }
+        }
+    }
+    if !text.is_empty() {
+        events.push(Event::Text(text.into()));
+    }
+    events
+}
+
+fn doc_bare_url(word: &str) -> bool {
+    let Some(rest) = word
+        .strip_prefix("https://")
+        .or_else(|| word.strip_prefix("http://"))
+    else {
+        return false;
+    };
+    // Avoid guessing where sentence punctuation ends and the URL starts/ends.
+    // This conservative ASCII subset covers ordinary documentation URLs while
+    // leaving quotes, parentheses, commas, markup and unusual URIs verbatim.
+    if !word
+        .bytes()
+        .all(|b| b.is_ascii_alphanumeric() || b"-._~:/?#@!$&+;=%".contains(&b))
+        || !word.ends_with(|c: char| c.is_ascii_alphanumeric() || matches!(c, '/' | '_' | '~'))
+    {
+        return false;
+    }
+    let authority = rest.split(['/', '?', '#']).next().unwrap_or("");
+    let host = if let Some((host, port)) = authority.split_once(':') {
+        if port.is_empty() || !port.bytes().all(|b| b.is_ascii_digit()) {
+            return false;
+        }
+        host
+    } else {
+        authority
+    };
+    host.split('.').all(|label| {
+        label.starts_with(|c: char| c.is_ascii_alphanumeric())
+            && label.ends_with(|c: char| c.is_ascii_alphanumeric())
+            && label
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'-')
+    })
+}
+
+fn doc_word_is_uri(word: &str) -> bool {
+    // URLs (including non-HTTP schemes and bare email addresses) are not code.
+    // Existing Markdown links/autolinks are excluded by the parser above.
+    let uri = word.split_once(':').is_some_and(|(scheme, rest)| {
+        // A label such as "SharePoint:" has no URI payload. Its colon must
+        // not prevent the identifier before it from receiving code styling.
+        !rest.is_empty()
+            && !rest.starts_with(':')
+            && scheme.starts_with(|c: char| c.is_ascii_alphabetic())
+            && scheme
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || matches!(c, '+' | '-' | '.'))
+    });
+    uri || word.contains("://") || word.starts_with("www.") || word.contains('@')
+}
+
+fn doc_word_needs_code(word: &str) -> bool {
+    if doc_word_is_uri(word) || word.contains('`') {
+        return false;
+    }
+    let underscore = word.contains('_') && word != "_";
+    if underscore && word.contains('-') {
+        return false;
+    }
+    let singular = if let Some(prefix) = word.strip_suffix("es").filter(|prefix| {
+        prefix.chars().all(|c| c.is_ascii_uppercase()) && prefix.ends_with(['S', 'X'])
+    }) {
+        prefix
+    } else if let Some(prefix) = word
+        .strip_suffix("ified")
+        .filter(|prefix| prefix.chars().all(|c| c.is_ascii_uppercase()))
+    {
+        prefix
+    } else {
+        word.strip_suffix('s').unwrap_or(word)
+    };
+    let camel_case = !singular.starts_with(|c: char| c.is_ascii_lowercase() || c.is_ascii_digit())
+        && singular.chars().all(char::is_alphanumeric)
+        && singular
+            .chars()
+            .filter(|c| c.is_uppercase())
+            .take(2)
+            .count()
+            == 2
+        && singular.chars().any(char::is_lowercase);
+    underscore || word.contains("::") || word.ends_with("()") || camel_case
 }
 
 /// Check if all schemas are mutually exclusive.
@@ -1017,6 +1360,304 @@ mod tests {
     };
 
     use super::StringValidator;
+
+    fn assert_doc_rendering(source: &str, expected: &str) {
+        let actual = super::render_doc_markdown(source);
+        assert_eq!(actual, expected);
+        assert_eq!(
+            super::render_doc_markdown(&actual),
+            actual,
+            "not idempotent"
+        );
+        let render = |parser: pulldown_cmark::Parser<'_>| {
+            let mut autolinks = Vec::new();
+            let events = parser.inspect(|event| {
+                if let pulldown_cmark::Event::Start(pulldown_cmark::Tag::Link {
+                    link_type: pulldown_cmark::LinkType::Autolink,
+                    dest_url,
+                    ..
+                }) = event
+                {
+                    if super::doc_bare_url(dest_url) {
+                        autolinks.push(dest_url.to_string());
+                    }
+                }
+            });
+            let mut html = String::new();
+            pulldown_cmark::html::push_html(&mut html, events);
+            for url in autolinks {
+                let visible = url.replace('&', "&amp;");
+                html = html.replace(&format!("<a href=\"{visible}\">{visible}</a>"), &visible);
+            }
+            // New inline-code styling is intentional; all rendered text,
+            // structure, HTML, link destinations and fenced code must agree.
+            html.replace("<code>", "").replace("</code>", "")
+        };
+        assert_eq!(
+            render(super::doc_markdown_parser(source)),
+            render(super::doc_markdown_parser(&actual)),
+            "rustdoc rendered meaning changed"
+        );
+        assert_eq!(
+            render(pulldown_cmark::Parser::new(source)),
+            render(pulldown_cmark::Parser::new(&actual)),
+            "default Markdown rendered meaning changed"
+        );
+    }
+
+    #[test]
+    fn test_doc_markdown_identifiers() {
+        assert_doc_rendering(
+            "OpenAI's ChatGPT uses SharePoint, snake_case, 'response.mcp_call.failed', std::fmt::Display and parse_json(). IDs, APIs, CPUs, JSON and UTF-8 stay prose.",
+            "`OpenAI`'s `ChatGPT` uses `SharePoint`, `snake_case`, '`response.mcp_call.failed`', `std::fmt::Display` and `parse_json()`. IDs, APIs, CPUs, JSON and UTF-8 stay prose.",
+        );
+        assert_doc_rendering(
+            "Includes details on how the model used the web (search, open_page, find_in_page).",
+            "Includes details on how the model used the web (search, `open_page`, `find_in_page`).",
+        );
+    }
+
+    #[test]
+    fn test_doc_markdown_authentic_connector_description() {
+        // Unmodified openai-8243cc8.json:
+        // components/schemas/MCPTool/properties/connector_id/description
+        // (also identical in BetaMCPTool).
+        let source = "Identifier for service connectors, like those available in ChatGPT. One of\n\
+`server_url`, `connector_id`, or `tunnel_id` must be provided. Learn more\n\
+about service connectors [here](https://developers.openai.com/api/docs/guides/tools-connectors-mcp#connectors).\n\
+\n\
+This field is deprecated for models released after September 1, 2026.\n\
+Use `server_url` to connect to a remote MCP server, or `tunnel_id` to\n\
+connect through a Secure MCP Tunnel.\n\
+\n\
+Currently supported `connector_id` values are:\n\
+\n\
+- Dropbox: `connector_dropbox`\n\
+- Gmail: `connector_gmail`\n\
+- Google Calendar: `connector_googlecalendar`\n\
+- Google Drive: `connector_googledrive`\n\
+- Microsoft Teams: `connector_microsoftteams`\n\
+- Outlook Calendar: `connector_outlookcalendar`\n\
+- Outlook Email: `connector_outlookemail`\n\
+- SharePoint: `connector_sharepoint`\n";
+        let expected = source
+            .replace("ChatGPT", "`ChatGPT`")
+            .replace("SharePoint:", "`SharePoint`:");
+        assert_eq!(crate::render_doc_markdown(source), expected);
+        assert_doc_rendering(source, &expected);
+    }
+
+    #[test]
+    fn test_doc_markdown_preserves_rustdoc_tables() {
+        for table in [
+            "a_b|c_d\n---|---\nx_y|z_a",
+            "| FooBar | snake_case |\n| --- | --- |\n| `existing_code` | x_y |\n",
+            "- Item\n\n  a_b|c_d\n  ---|---\n  x_y|z_a\n",
+        ] {
+            assert!(super::doc_markdown_parser(table).any(|event| matches!(
+                event,
+                pulldown_cmark::Event::Start(pulldown_cmark::Tag::Table(_))
+            )));
+            assert_doc_rendering(table, table);
+        }
+        assert_doc_rendering(
+            "FooBar before.\n\na_b|c_d\n---|---\nx_y|z_a\n\nOpenAI after.",
+            "`FooBar` before.\n\na_b|c_d\n---|---\nx_y|z_a\n\n`OpenAI` after.",
+        );
+        assert_doc_rendering(
+            "FooBar[^some_note]\n\n[^some_note]: snake_case\n    FooBar",
+            "`FooBar`[^some_note]\n\n[^some_note]: snake_case\n    FooBar",
+        );
+    }
+
+    #[test]
+    fn test_doc_markdown_preserves_complete_bare_urls() {
+        for url in [
+            "https://example.org/foo'bar_baz",
+            "https://example.org/foo'FooBar",
+            "https://example.org/foo?key='bar_baz'&other=FooBar",
+            "(https://example.org/foo'bar_baz).",
+            "urn:example:foo'bar_baz",
+            "www.example.org/foo'bar_baz",
+            "mailto:foo'bar_baz@example.org",
+        ] {
+            assert_doc_rendering(url, url);
+            assert_doc_rendering(
+                &format!("OpenAI uses {url} and snake_case."),
+                &format!("`OpenAI` uses {url} and `snake_case`."),
+            );
+        }
+    }
+
+    #[test]
+    fn test_doc_markdown_links_unambiguous_bare_http_urls() {
+        assert_eq!(
+            super::doc_display_events("https://example.org/docs"),
+            super::doc_display_events("<https://example.org/docs>"),
+        );
+        assert_ne!(
+            super::doc_display_events("[label](https://example.org/original)"),
+            super::doc_display_events("[label](https://example.org/changed)"),
+            "the semantic guard must retain independently chosen link targets",
+        );
+        assert_doc_rendering(
+            "The OpenAI REST API. Please see https://platform.openai.com/docs/api-reference for more details.\n\nhttps://openai.com/policies/terms-of-use",
+            "The `OpenAI` REST API. Please see <https://platform.openai.com/docs/api-reference> for more details.\n\n<https://openai.com/policies/terms-of-use>",
+        );
+        assert_doc_rendering(
+            "- See https://example.org/foo_bar?key=value&other=next\nlazy continuation",
+            "- See <https://example.org/foo_bar?key=value&other=next>\n  lazy continuation",
+        );
+        let protected = concat!(
+            "`https://example.org/docs` [label](https://example.org/docs) ",
+            "<https://example.org/docs> ![image](https://example.org/docs)\n\n",
+            "<span>https://example.org/docs</span>\n\n",
+            "```text\nhttps://example.org/docs\n```\n\n",
+            "url|value\n---|---\nhttps://example.org/docs|x\n\n",
+            "Footnote[^note]\n\n[^note]: https://example.org/docs\n",
+        );
+        assert_doc_rendering(protected, protected);
+        for ambiguous in [
+            "https://example.org/docs.",
+            "(https://example.org/docs)",
+            "https://example.org/foo'bar_baz",
+            "https://example.org/café",
+            "https://example.org/foo\\_bar",
+            "https://example.org/a&amp;b",
+            "https://[::1]/docs",
+            "https://user@example.org/docs",
+            "https://example.org/a,b",
+            "https://example.org/path?",
+        ] {
+            assert_doc_rendering(ambiguous, ambiguous);
+        }
+    }
+
+    #[test]
+    fn test_doc_markdown_preserves_existing_markdown() {
+        let unchanged = concat!(
+            "`snake_case` and ``code_with ` embedded`` and `multi_line\ncode_span`.\n\n",
+            "[OpenAI snake_case](https://example.com/foo_bar \"FooBar\") and ",
+            "![FooBar](image_file.png) and <https://example.com/foo_bar>.\n\n",
+            "[FooBar reference][some_ref]\n\n",
+            "[some_ref]: https://example.com/foo_bar \"FooBar\"\n\n",
+            "Bare https://example.com/foo_bar?q=FooBar, www.example.com/foo_bar, ",
+            "mailto:some_one@example.com and urn:some_id remain unchanged.\n\n",
+            "Escaped snake\\_case, \\`literal\\`, &amp; &#95;, café, 日本語 and 🦀.\n\n",
+            "<code>snake_case OpenAI</code> <span title=\"FooBar\">snake_case</span><br>\n\n",
+            "<div>\nFooBar snake_case\n</div>\n\n",
+            "```json\n{\"description\": \"OpenAI snake_case\"}\n```\n\n",
+            "~~~text\nOpenAI snake_case\n~~~\n\n",
+            "    OpenAI snake_case\n",
+        );
+        assert_doc_rendering(unchanged, unchanged);
+        assert_doc_rendering(
+            "**FooBar** and *snake_case*, café 🦀 and `already_code`.",
+            "**`FooBar`** and *`snake_case`*, café 🦀 and `already_code`.",
+        );
+    }
+
+    #[test]
+    fn test_doc_markdown_lazy_list_continuations() {
+        assert_doc_rendering(
+            "- `stream`: If set to true, the model response data will be streamed\nas it is generated using [server-sent events](https://example.com/foo_bar).\nSee the [Streaming section below](https://example.com/streaming-events)\nfor more information.\n- `limit`: A limit between\n1 and 100, and the default is 20.\n\nOutside the list.",
+            "- `stream`: If set to true, the model response data will be streamed\n  as it is generated using [server-sent events](https://example.com/foo_bar).\n  See the [Streaming section below](https://example.com/streaming-events)\n  for more information.\n- `limit`: A limit between\n  1 and 100, and the default is 20.\n\nOutside the list.",
+        );
+        assert_doc_rendering(
+            "1. Outer item\nlazy line\n   - Inner item\nlazy inner\n   - Next item\n     already indented\n\nAfterwards.",
+            "1. Outer item\n   lazy line\n   - Inner item\n     lazy inner\n   - Next item\n     already indented\n\nAfterwards.",
+        );
+        assert_doc_rendering(
+            "- Hard break  \ncontinuation\n- Backslash break\\\ncontinuation\n",
+            "- Hard break  \n  continuation\n- Backslash break\\\n  continuation\n",
+        );
+    }
+
+    #[test]
+    fn test_doc_markdown_list_code_and_html_are_untouched() {
+        assert_doc_rendering(
+            "- FooBar wraps\nto snake_case.\n\n  ```json\n  {\"description\": \"OpenAI snake_case\"}\n  ```\n\n  ~~~text\n  snake_case\n  ~~~\n\n      indented_code\n\n  <div>\n  snake_case\n  </div>\n\n- Last item\n",
+            "- `FooBar` wraps\n  to `snake_case`.\n\n  ```json\n  {\"description\": \"OpenAI snake_case\"}\n  ```\n\n  ~~~text\n  snake_case\n  ~~~\n\n      indented_code\n\n  <div>\n  snake_case\n  </div>\n\n- Last item\n",
+        );
+        let unchanged = "- `snake_case\ncode_span`\n\n> - FooBar\n>   snake_case\n\n- <code>snake_case\nOpenAI</code>\n";
+        assert_doc_rendering(unchanged, unchanged);
+    }
+
+    #[test]
+    fn test_doc_markdown_ambiguous_backticks_preserve_display() {
+        for unchanged in [
+            "snake_case`existing_code`",
+            "`existing_code`FooBar",
+            "An unmatched ` before OpenAI",
+        ] {
+            assert_doc_rendering(unchanged, unchanged);
+        }
+        assert_doc_rendering(
+            "OpenAI followed by an unmatched `",
+            "`OpenAI` followed by an unmatched `",
+        );
+        assert_doc_rendering(
+            "- FooBar\r\nlazy continuation\r\n",
+            "- `FooBar`\r\n  lazy continuation\r\n",
+        );
+    }
+
+    #[test]
+    fn test_doc_markdown_does_not_change_metadata_or_names() {
+        let metadata = Some(Box::new(schemars::schema::Metadata {
+            title: Some("FooBar".to_string()),
+            description: Some("OpenAI snake_case".to_string()),
+            ..Default::default()
+        }));
+        let original = metadata.clone();
+        assert_eq!(
+            super::metadata_description(&metadata).as_deref(),
+            Some("OpenAI snake_case")
+        );
+        assert_eq!(
+            super::metadata_title_and_description(&metadata).as_deref(),
+            Some("FooBar\n\nOpenAI snake_case")
+        );
+        assert_eq!(
+            super::get_type_name(&Name::Unknown, &metadata).as_deref(),
+            Some("FooBar")
+        );
+        let _ = super::render_doc_markdown(&super::metadata_description(&metadata).unwrap());
+        assert_eq!(metadata, original);
+    }
+
+    #[test]
+    fn test_doc_markdown_enum_emission_keeps_raw_descriptions() {
+        use crate::type_entry::{
+            StructProperty, StructPropertyRename, StructPropertyState, Variant, VariantDetails,
+        };
+        let mut types = crate::TypeSpace::default();
+        let string_type = types.add_type(&schema_for!(String).schema.into()).unwrap();
+        let variant = Variant {
+            raw_name: "Example".to_string(),
+            ident_name: Some("Example".to_string()),
+            description: Some("OpenAI snake_case".to_string()),
+            details: VariantDetails::Struct(vec![StructProperty {
+                name: "value".to_string(),
+                rename: StructPropertyRename::None,
+                state: StructPropertyState::Required,
+                description: Some("- FooBar\nlazy continuation".to_string()),
+                type_id: string_type,
+            }]),
+        };
+        let original = variant.clone();
+        let output = crate::enums::output_variant(
+            &variant,
+            &types,
+            &mut crate::output::OutputSpace::default(),
+            "ExampleEnum",
+        )
+        .to_string();
+        assert!(output.contains(&quote::quote! { #[doc = "`OpenAI` `snake_case`"] }.to_string()));
+        assert!(output
+            .contains(&quote::quote! { #[doc = "- `FooBar`\n  lazy continuation"] }.to_string()));
+        assert_eq!(variant, original);
+    }
 
     #[test]
     fn test_non_exclusive_structs() {

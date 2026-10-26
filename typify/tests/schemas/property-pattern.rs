@@ -8,7 +8,7 @@ pub struct TestGrammarForPatternProperties {
 }
 impl TestGrammarForPatternProperties {
     pub fn builder() -> builder::TestGrammarForPatternProperties {
-        Default::default()
+        <builder::TestGrammarForPatternProperties as ::std::default::Default>::default()
     }
 }
 #[doc = "`TestGrammarForPatternPropertiesRulesKey`"]

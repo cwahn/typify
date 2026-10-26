@@ -8,7 +8,7 @@ pub struct TestType {
 }
 impl TestType {
     pub fn builder() -> builder::TestType {
-        Default::default()
+        <builder::TestType as ::std::default::Default>::default()
     }
 }
 #[doc = "`TypeThatHasMoreDerives`"]
@@ -23,11 +23,16 @@ impl ::std::ops::Deref for TypeThatHasMoreDerives {
         &self.0
     }
 }
-impl ::std::convert::From<TypeThatHasMoreDerives>
-    for ::std::collections::HashMap<::std::string::String, ::std::string::String>
+impl<__TypifyBuildHasher: ::std::hash::BuildHasher + ::std::default::Default>
+    ::std::convert::From<TypeThatHasMoreDerives>
+    for ::std::collections::HashMap<
+        ::std::string::String,
+        ::std::string::String,
+        __TypifyBuildHasher,
+    >
 {
     fn from(value: TypeThatHasMoreDerives) -> Self {
-        value.0
+        value.0.into_iter().collect()
     }
 }
 impl ::std::convert::From<::std::collections::HashMap<::std::string::String, ::std::string::String>>

@@ -14,11 +14,16 @@ impl ::std::ops::Deref for Fruit {
         &self.0
     }
 }
-impl ::std::convert::From<Fruit>
-    for ::std::collections::HashMap<::std::string::String, ::std::string::String>
+impl<__TypifyBuildHasher: ::std::hash::BuildHasher + ::std::default::Default>
+    ::std::convert::From<Fruit>
+    for ::std::collections::HashMap<
+        ::std::string::String,
+        ::std::string::String,
+        __TypifyBuildHasher,
+    >
 {
     fn from(value: Fruit) -> Self {
-        value.0
+        value.0.into_iter().collect()
     }
 }
 impl ::std::convert::From<::std::collections::HashMap<::std::string::String, ::std::string::String>>

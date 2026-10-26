@@ -1,0 +1,32 @@
+{
+  "definitions": {
+    "FunctionCallOutput": { "type": "string", "enum": ["TextContent", "ImageContent", "FileContent"] },
+    "OpaqueRecovery": { "type": "string", "enum": ["ContainerAutoParam", "LocalEnvironmentParam", "ContainerReferenceParam"] },
+    "Recovery272": { "type": "string", "enum": ["connector_dropbox", "connector_gmail", "connector_sharepoint"], "default": "connector_sharepoint" },
+    "ApplyPatchOperation": {
+      "type": "string",
+      "enum": ["CreateFileOperation", "DeleteFileOperation", "UpdateFileOperation"],
+      "default": "DeleteFileOperation"
+    },
+    "TransferState": { "type": "string", "enum": ["TransferStateQueued", "TransferStateRunning"], "default": "TransferStateRunning" },
+    "JobStatus": { "type": "string", "enum": ["JobQueuedStatus", "JobDoneStatus"] },
+    "AccessMode": { "type": "string", "enum": ["ReadOnly", "ReadWrite"] },
+    "FlagMode": { "type": "string", "enum": ["FlagModeA", "FlagModeB"] },
+    "WholeMode": { "type": "string", "enum": ["WholeMode", "WholeModeOther"] },
+    "KeywordOperation": { "type": "string", "enum": ["OperationSelf", "OperationOther"] },
+    "UnicodeOperation": { "type": "string", "enum": ["🔥Operation", "🚀Operation"] },
+    "CreateFileOperation": { "type": "object", "properties": { "create": { "type": "string" } }, "required": ["create"], "additionalProperties": false },
+    "DeleteFileOperation": { "type": "object", "properties": { "delete": { "type": "string" } }, "required": ["delete"], "additionalProperties": false },
+    "PayloadPatchOperation": {
+      "oneOf": [{ "$ref": "#/definitions/CreateFileOperation" }, { "$ref": "#/definitions/DeleteFileOperation" }],
+      "default": { "create": "new" }
+    },
+    "TaggedOperation": {
+      "oneOf": [
+        { "type": "object", "properties": { "kind": { "enum": ["CreateFileOperation"] } }, "required": ["kind"], "additionalProperties": false },
+        { "type": "object", "properties": { "kind": { "enum": ["DeleteFileOperation"] }, "value": { "type": "string" }, "count": { "type": "integer" } }, "required": ["kind", "value", "count"], "additionalProperties": false }
+      ],
+      "default": { "kind": "CreateFileOperation" }
+    }
+  }
+}

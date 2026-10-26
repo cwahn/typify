@@ -1,0 +1,75 @@
+{
+  "title": "FlattenedFieldNames",
+  "type": "object",
+  "properties": {
+    "compaction": { "$ref": "#/definitions/ActualModelIdsCompaction" }
+  },
+  "definitions": {
+    "ActualModelIdsCompaction": {
+      "anyOf": [
+        { "$ref": "#/definitions/ModelIdsResponses" },
+        { "type": "string" },
+        { "type": "null" }
+      ]
+    },
+    "ModelIdsResponses": {
+      "type": "string",
+      "enum": ["model-a", "model-b"]
+    },
+    "ObjectAny": {
+      "anyOf": [
+        { "$ref": "#/definitions/RequestId" },
+        { "$ref": "#/definitions/ResponseBody" }
+      ]
+    },
+    "ObjectAll": {
+      "allOf": [
+        { "$ref": "#/definitions/RequestId" },
+        { "$ref": "#/definitions/ResponseBody" }
+      ]
+    },
+    "RequestId": {
+      "type": "object",
+      "properties": {
+        "request-id": { "type": "string" },
+        "enabled": { "type": "boolean" }
+      },
+      "required": ["request-id"]
+    },
+    "ResponseBody": {
+      "type": "object",
+      "properties": {
+        "request-id": { "type": "string" },
+        "enabled": { "type": "boolean" }
+      },
+      "required": ["enabled"]
+    },
+    "CollisionFields": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "string" },
+        { "$ref": "#/definitions/String_2" },
+        { "$ref": "#/definitions/Type" },
+        {
+          "title": "HTTP response",
+          "type": "object",
+          "properties": { "wire-key": { "type": "boolean" } }
+        },
+        { "type": "object", "properties": { "unnamed": { "type": "boolean" } } },
+        true,
+        { "$ref": "#/definitions/Subtype_5" },
+        { "$ref": "#/definitions/Escaped~1Name" },
+        {
+          "title": "self",
+          "type": "object",
+          "properties": { "keyword": { "type": "boolean" } }
+        },
+        { "$ref": "#/definitions/Type" }
+      ]
+    },
+    "String_2": { "type": "string" },
+    "Type": { "type": "object", "properties": { "type": { "type": "boolean" } } },
+    "Subtype_5": { "type": "object", "properties": { "fallback": { "type": "boolean" } } },
+    "Escaped/Name": { "type": "object", "properties": { "escaped": { "type": "boolean" } } }
+  }
+}

@@ -74,11 +74,12 @@ impl ::std::ops::Deref for MapWithDateKeys {
         &self.0
     }
 }
-impl ::std::convert::From<MapWithDateKeys>
-    for ::std::collections::HashMap<::chrono::naive::NaiveDate, Value>
+impl<__TypifyBuildHasher: ::std::hash::BuildHasher + ::std::default::Default>
+    ::std::convert::From<MapWithDateKeys>
+    for ::std::collections::HashMap<::chrono::naive::NaiveDate, Value, __TypifyBuildHasher>
 {
     fn from(value: MapWithDateKeys) -> Self {
-        value.0
+        value.0.into_iter().collect()
     }
 }
 impl ::std::convert::From<::std::collections::HashMap<::chrono::naive::NaiveDate, Value>>
@@ -102,11 +103,16 @@ impl ::std::ops::Deref for MapWithDateTimeKeys {
         &self.0
     }
 }
-impl ::std::convert::From<MapWithDateTimeKeys>
-    for ::std::collections::HashMap<::chrono::DateTime<::chrono::offset::Utc>, Value>
+impl<__TypifyBuildHasher: ::std::hash::BuildHasher + ::std::default::Default>
+    ::std::convert::From<MapWithDateTimeKeys>
+    for ::std::collections::HashMap<
+        ::chrono::DateTime<::chrono::offset::Utc>,
+        Value,
+        __TypifyBuildHasher,
+    >
 {
     fn from(value: MapWithDateTimeKeys) -> Self {
-        value.0
+        value.0.into_iter().collect()
     }
 }
 impl
@@ -130,9 +136,12 @@ impl ::std::ops::Deref for MapWithKeys {
         &self.0
     }
 }
-impl ::std::convert::From<MapWithKeys> for ::std::collections::HashMap<Eh, Value> {
+impl<__TypifyBuildHasher: ::std::hash::BuildHasher + ::std::default::Default>
+    ::std::convert::From<MapWithKeys>
+    for ::std::collections::HashMap<Eh, Value, __TypifyBuildHasher>
+{
     fn from(value: MapWithKeys) -> Self {
-        value.0
+        value.0.into_iter().collect()
     }
 }
 impl ::std::convert::From<::std::collections::HashMap<Eh, Value>> for MapWithKeys {

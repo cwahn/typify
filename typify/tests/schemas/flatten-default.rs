@@ -7,7 +7,7 @@ pub struct Container {
 }
 impl Container {
     pub fn builder() -> builder::Container {
-        Default::default()
+        <builder::Container as ::std::default::Default>::default()
     }
 }
 #[doc = "`ContainerThing`"]
@@ -20,7 +20,7 @@ pub struct ContainerThing {
 }
 impl ::std::default::Default for ContainerThing {
     fn default() -> Self {
-        ContainerThing {
+        Self {
             id: ::std::option::Option::Some("abc".to_string()),
             extra: [("extra_key".to_string(), "extra_value".to_string())]
                 .into_iter()
@@ -30,7 +30,7 @@ impl ::std::default::Default for ContainerThing {
 }
 impl ContainerThing {
     pub fn builder() -> builder::ContainerThing {
-        Default::default()
+        <builder::ContainerThing as ::std::default::Default>::default()
     }
 }
 #[doc = " Types for composing complex structures."]
@@ -45,7 +45,7 @@ pub mod builder {
     impl ::std::default::Default for Container {
         fn default() -> Self {
             Self {
-                thing: Ok(Default::default()),
+                thing: Ok(<::std::option::Option<super::ContainerThing>>::default()),
             }
         }
     }
@@ -92,7 +92,7 @@ pub mod builder {
     impl ::std::default::Default for ContainerThing {
         fn default() -> Self {
             Self {
-                id: Ok(Default::default()),
+                id: Ok(<::std::option::Option<::std::string::String>>::default()),
                 extra: Err("no value supplied for extra".to_string()),
             }
         }

@@ -6,6 +6,7 @@
     Clone,
     Copy,
     Debug,
+    Default,
     Eq,
     Hash,
     Ord,
@@ -13,6 +14,7 @@
     PartialOrd,
 )]
 pub enum TestEnum {
+    #[default]
     #[serde(rename = "failure")]
     Failure,
     #[serde(rename = "skipped")]
@@ -52,11 +54,6 @@ impl ::std::convert::TryFrom<::std::string::String> for TestEnum {
         value: ::std::string::String,
     ) -> ::std::result::Result<Self, self::error::ConversionError> {
         value.parse()
-    }
-}
-impl ::std::default::Default for TestEnum {
-    fn default() -> Self {
-        TestEnum::Failure
     }
 }
 #[doc = " Error types."]

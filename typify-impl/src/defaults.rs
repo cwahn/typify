@@ -373,8 +373,11 @@ impl TypeEntry {
                 });
             let fn_name = sanitize(&format!("{}_{}", type_name, prop_name), Case::Snake);
             let fn_ident = format_ident!("{}", fn_name);
+            let const_fn = self
+                .unit_variant_for_value(&value)
+                .map(|_| quote! { const });
             let def = quote! {
-                pub(super) fn #fn_ident() -> #n {
+                pub(super) #const_fn fn #fn_ident() -> #n {
                     #value
                 }
             };

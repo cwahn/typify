@@ -1,0 +1,51 @@
+{
+  "definitions": {
+    "Default": { "type": "string", "enum": ["a", "b"] },
+    "DefaultFactory": {
+      "anyOf": [
+        { "$ref": "#/definitions/Default" },
+        { "type": "string" }
+      ]
+    },
+    "TryInto": { "type": "string", "enum": ["a", "b"] },
+    "TryIntoFactory": {
+      "anyOf": [
+        { "$ref": "#/definitions/TryInto" },
+        { "type": "string" }
+      ]
+    },
+    "Clone": { "type": "string", "enum": ["a", "b"] },
+    "CloneFrom": { "type": "string", "enum": ["a", "b"] },
+    "From": { "type": "string", "enum": ["a", "b"] },
+    "TryFrom": { "type": "string", "enum": ["a", "b"] },
+    "Into": { "type": "string", "enum": ["a", "b"] },
+    "Fmt": { "type": "string", "enum": ["a", "b"] },
+    "ToOwned": { "type": "string", "enum": ["a", "b"] },
+    "CloneInto": { "type": "string", "enum": ["a", "b"] },
+    "Borrow": { "type": "string", "enum": ["a", "b"] },
+    "BorrowMut": { "type": "string", "enum": ["a", "b"] },
+    "TypeId": { "type": "string", "enum": ["a", "b"] },
+    "DefaultValue": { "type": "string", "enum": ["a", "b"] },
+    "DefaultValue_2": { "type": "string", "enum": ["a", "b"] },
+    "BuilderApiFields": {
+      "anyOf": [
+        { "$ref": "#/definitions/Default" },
+        { "$ref": "#/definitions/DefaultValue" },
+        { "$ref": "#/definitions/DefaultValue_2" },
+        { "$ref": "#/definitions/Clone" },
+        { "$ref": "#/definitions/CloneFrom" },
+        { "$ref": "#/definitions/From" },
+        { "$ref": "#/definitions/TryFrom" },
+        { "$ref": "#/definitions/Into" },
+        { "$ref": "#/definitions/TryInto" },
+        { "$ref": "#/definitions/Fmt" },
+        { "$ref": "#/definitions/ToOwned" },
+        { "$ref": "#/definitions/CloneInto" },
+        { "$ref": "#/definitions/Borrow" },
+        { "$ref": "#/definitions/BorrowMut" },
+        { "$ref": "#/definitions/TypeId" },
+        { "type": "string" }
+      ]
+    }
+  }
+}

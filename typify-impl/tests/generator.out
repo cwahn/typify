@@ -17,7 +17,7 @@ mod types {
     }
     impl AllTheTraits {
         pub fn builder() -> builder::AllTheTraits {
-            Default::default()
+            <builder::AllTheTraits as ::std::default::Default>::default()
         }
     }
     #[doc = "`CompoundType`"]
@@ -28,7 +28,7 @@ mod types {
     }
     impl CompoundType {
         pub fn builder() -> builder::CompoundType {
-            Default::default()
+            <builder::CompoundType as ::std::default::Default>::default()
         }
     }
     #[doc = "`Pair`"]
@@ -49,7 +49,7 @@ mod types {
     }
     impl Pair {
         pub fn builder() -> builder::Pair {
-            Default::default()
+            <builder::Pair as ::std::default::Default>::default()
         }
     }
     #[doc = "`StringEnum`"]
@@ -252,10 +252,10 @@ mod types {
     }
     #[doc = " Generation of default values for serde."]
     pub mod defaults {
-        pub(super) fn pair_a() -> super::StringEnum {
+        pub(super) const fn pair_a() -> super::StringEnum {
             super::StringEnum::One
         }
-        pub(super) fn pair_b() -> super::StringEnum {
+        pub(super) const fn pair_b() -> super::StringEnum {
             super::StringEnum::Two
         }
     }

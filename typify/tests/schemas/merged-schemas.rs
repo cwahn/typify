@@ -7,7 +7,7 @@ pub struct BarProp {
 }
 impl BarProp {
     pub fn builder() -> builder::BarProp {
-        Default::default()
+        <builder::BarProp as ::std::default::Default>::default()
     }
 }
 #[doc = "`ButNotThat`"]
@@ -18,7 +18,7 @@ pub struct ButNotThat {
 }
 impl ButNotThat {
     pub fn builder() -> builder::ButNotThat {
-        Default::default()
+        <builder::ButNotThat as ::std::default::Default>::default()
     }
 }
 #[doc = "if we don't see this, we dropped the metadata"]
@@ -31,7 +31,7 @@ pub struct CommentedTypeMerged {
 }
 impl CommentedTypeMerged {
     pub fn builder() -> builder::CommentedTypeMerged {
-        Default::default()
+        <builder::CommentedTypeMerged as ::std::default::Default>::default()
     }
 }
 #[doc = "`HereAndThere`"]
@@ -59,7 +59,7 @@ pub struct JsonResponseBase {
 }
 impl JsonResponseBase {
     pub fn builder() -> builder::JsonResponseBase {
-        Default::default()
+        <builder::JsonResponseBase as ::std::default::Default>::default()
     }
 }
 #[doc = "`JsonSuccess`"]
@@ -71,7 +71,7 @@ pub struct JsonSuccess {
 }
 impl JsonSuccess {
     pub fn builder() -> builder::JsonSuccess {
-        Default::default()
+        <builder::JsonSuccess as ::std::default::Default>::default()
     }
 }
 #[doc = "x"]
@@ -82,7 +82,7 @@ pub struct JsonSuccessBase {
 }
 impl JsonSuccessBase {
     pub fn builder() -> builder::JsonSuccessBase {
-        Default::default()
+        <builder::JsonSuccessBase as ::std::default::Default>::default()
     }
 }
 #[doc = "`JsonSuccessBaseResult`"]
@@ -185,7 +185,7 @@ impl ::std::convert::TryFrom<::std::string::String> for JsonSuccessResult {
 pub struct MergeEmpty {}
 impl MergeEmpty {
     pub fn builder() -> builder::MergeEmpty {
-        Default::default()
+        <builder::MergeEmpty as ::std::default::Default>::default()
     }
 }
 #[doc = "`MergeNumberBounds`"]
@@ -336,7 +336,7 @@ pub struct OrderDependentMerge {
 }
 impl OrderDependentMerge {
     pub fn builder() -> builder::OrderDependentMerge {
-        Default::default()
+        <builder::OrderDependentMerge as ::std::default::Default>::default()
     }
 }
 #[doc = "`Pickingone`"]
@@ -346,7 +346,7 @@ pub struct Pickingone {
 }
 impl Pickingone {
     pub fn builder() -> builder::Pickingone {
-        Default::default()
+        <builder::Pickingone as ::std::default::Default>::default()
     }
 }
 #[doc = "`PickingoneInstallation`"]
@@ -357,7 +357,7 @@ pub struct PickingoneInstallation {
 }
 impl PickingoneInstallation {
     pub fn builder() -> builder::PickingoneInstallation {
-        Default::default()
+        <builder::PickingoneInstallation as ::std::default::Default>::default()
     }
 }
 #[doc = "`PickingoneSuspendedBy`"]
@@ -368,7 +368,7 @@ pub struct PickingoneSuspendedBy {
 }
 impl PickingoneSuspendedBy {
     pub fn builder() -> builder::PickingoneSuspendedBy {
-        Default::default()
+        <builder::PickingoneSuspendedBy as ::std::default::Default>::default()
     }
 }
 #[doc = "`PickingoneUser`"]
@@ -379,7 +379,7 @@ pub struct PickingoneUser {
 }
 impl PickingoneUser {
     pub fn builder() -> builder::PickingoneUser {
-        Default::default()
+        <builder::PickingoneUser as ::std::default::Default>::default()
     }
 }
 #[doc = "`TrimFat`"]
@@ -389,7 +389,7 @@ pub struct TrimFat {
 }
 impl TrimFat {
     pub fn builder() -> builder::TrimFat {
-        Default::default()
+        <builder::TrimFat as ::std::default::Default>::default()
     }
 }
 #[doc = "`TriplePattern`"]
@@ -453,7 +453,7 @@ pub struct UnchangedByMerge {
 }
 impl UnchangedByMerge {
     pub fn builder() -> builder::UnchangedByMerge {
-        Default::default()
+        <builder::UnchangedByMerge as ::std::default::Default>::default()
     }
 }
 #[doc = "`UnchangedByMergeTag`"]
@@ -571,7 +571,7 @@ pub struct Unsatisfiable3A {
 }
 impl Unsatisfiable3A {
     pub fn builder() -> builder::Unsatisfiable3A {
-        Default::default()
+        <builder::Unsatisfiable3A as ::std::default::Default>::default()
     }
 }
 #[doc = "`Unsatisfiable3B`"]
@@ -699,7 +699,7 @@ pub mod builder {
     impl ::std::default::Default for BarProp {
         fn default() -> Self {
             Self {
-                bar: Ok(Default::default()),
+                bar: Ok(<::std::option::Option<::serde_json::Value>>::default()),
             }
         }
     }
@@ -736,7 +736,7 @@ pub mod builder {
     impl ::std::default::Default for ButNotThat {
         fn default() -> Self {
             Self {
-                this: Ok(Default::default()),
+                this: Ok(<::std::option::Option<::serde_json::Value>>::default()),
             }
         }
     }
@@ -775,8 +775,8 @@ pub mod builder {
     impl ::std::default::Default for CommentedTypeMerged {
         fn default() -> Self {
             Self {
-                x: Ok(Default::default()),
-                y: Ok(Default::default()),
+                x: Ok(<::std::option::Option<::serde_json::Value>>::default()),
+                y: Ok(<::std::option::Option<::serde_json::Value>>::default()),
             }
         }
     }
@@ -831,7 +831,7 @@ pub mod builder {
     impl ::std::default::Default for JsonResponseBase {
         fn default() -> Self {
             Self {
-                result: Ok(Default::default()),
+                result: Ok(<::std::option::Option<::std::string::String>>::default()),
             }
         }
     }
@@ -1004,7 +1004,7 @@ pub mod builder {
     impl ::std::default::Default for OrderDependentMerge {
         fn default() -> Self {
             Self {
-                bar: Ok(Default::default()),
+                bar: Ok(<::std::option::Option<::serde_json::Value>>::default()),
                 baz: Err("no value supplied for baz".to_string()),
             }
         }
@@ -1100,7 +1100,7 @@ pub mod builder {
     impl ::std::default::Default for PickingoneInstallation {
         fn default() -> Self {
             Self {
-                suspended_by: Ok(Default::default()),
+                suspended_by: Ok(<::std::option::Option<super::PickingoneUser>>::default()),
             }
         }
     }
@@ -1143,7 +1143,7 @@ pub mod builder {
     impl ::std::default::Default for PickingoneSuspendedBy {
         fn default() -> Self {
             Self {
-                email: Ok(Default::default()),
+                email: Ok(<::std::option::Option<::std::string::String>>::default()),
             }
         }
     }
@@ -1186,7 +1186,7 @@ pub mod builder {
     impl ::std::default::Default for PickingoneUser {
         fn default() -> Self {
             Self {
-                email: Ok(Default::default()),
+                email: Ok(<::std::option::Option<::std::string::String>>::default()),
             }
         }
     }
@@ -1299,7 +1299,7 @@ pub mod builder {
     impl ::std::default::Default for Unsatisfiable3A {
         fn default() -> Self {
             Self {
-                action: Ok(Default::default()),
+                action: Ok(<::std::option::Option<super::Unsatisfiable3C>>::default()),
             }
         }
     }

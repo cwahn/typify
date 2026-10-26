@@ -17,9 +17,9 @@ impl ::std::fmt::Display for IdOrName {
 impl ::std::str::FromStr for IdOrName {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::uuid::Uuid>() {
             Ok(Self::Id(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<Name>() {
             Ok(Self::Name(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -68,9 +68,9 @@ impl ::std::fmt::Display for IdOrNameRedundant {
 impl ::std::str::FromStr for IdOrNameRedundant {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::uuid::Uuid>() {
             Ok(Self::Uuid(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<Name>() {
             Ok(Self::String(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -119,9 +119,9 @@ impl ::std::fmt::Display for IdOrYolo {
 impl ::std::str::FromStr for IdOrYolo {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::uuid::Uuid>() {
             Ok(Self::Id(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<IdOrYoloYolo>() {
             Ok(Self::Yolo(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -222,14 +222,14 @@ impl ::std::convert::From<Name> for ::std::string::String {
 impl ::std::str::FromStr for Name {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if value.chars().count() > 63usize {
-            return Err("longer than 63 characters".into());
-        }
         static PATTERN: ::std::sync::LazyLock<::regress::Regex> = ::std::sync::LazyLock::new(
             || {
                 :: regress :: Regex :: new ("^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z][a-z0-9-]*[a-zA-Z0-9]$") . unwrap ()
             },
         );
+        if value.chars().count() > 63usize {
+            return Err("longer than 63 characters".into());
+        }
         if PATTERN.find(value).is_none() {
             return Err ("doesn't match pattern \"^(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$)^[a-z][a-z0-9-]*[a-zA-Z0-9]$\"" . into ()) ;
         }

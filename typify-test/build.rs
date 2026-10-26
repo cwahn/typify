@@ -169,6 +169,32 @@ impl JsonSchema for TriplePattern {
 }
 
 fn main() {
+    let schema_path = "../typify-impl/tests/variant-names.json";
+    println!("cargo:rerun-if-changed={schema_path}");
+    let schema = serde_json::from_str(&fs::read_to_string(schema_path).unwrap()).unwrap();
+    let mut variant_types = TypeSpace::default();
+    variant_types.add_root_schema(schema).unwrap();
+    let variant_output =
+        prettyplease::unparse(&syn::parse2::<syn::File>(variant_types.to_stream()).unwrap());
+    fs::write(
+        Path::new(&env::var("OUT_DIR").unwrap()).join("variant_names.rs"),
+        variant_output,
+    )
+    .unwrap();
+
+    let schema_path = "../typify-impl/tests/concrete-defaults.json";
+    println!("cargo:rerun-if-changed={schema_path}");
+    let schema = serde_json::from_str(&fs::read_to_string(schema_path).unwrap()).unwrap();
+    let mut concrete_types = TypeSpace::new(TypeSpaceSettings::default().with_struct_builder(true));
+    concrete_types.add_root_schema(schema).unwrap();
+    let concrete_output =
+        prettyplease::unparse(&syn::parse2::<syn::File>(concrete_types.to_stream()).unwrap());
+    fs::write(
+        Path::new(&env::var("OUT_DIR").unwrap()).join("concrete_defaults.rs"),
+        concrete_output,
+    )
+    .unwrap();
+
     // Compile the nullable naming regressions as real Rust, not just tokens.
     let schema_path = "../typify-impl/tests/nullable-names.json";
     println!("cargo:rerun-if-changed={schema_path}");

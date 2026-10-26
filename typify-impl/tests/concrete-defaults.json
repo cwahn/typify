@@ -1,0 +1,67 @@
+{
+  "definitions": {
+    "Bounded": { "type": "string", "minLength": 10000, "maxLength": 10485760, "pattern": "^[a-zé]+$" },
+    "StringMap": { "type": "object", "additionalProperties": { "type": "string" } },
+    "OptionalStringMap": { "type": ["object", "null"], "additionalProperties": { "type": "string" } },
+    "ParseOrder": { "oneOf": [{ "type": "string", "pattern": "^.+$" }, { "type": "number" }, { "type": "boolean" }] },
+    "ScalarValue": { "oneOf": [{ "type": "integer" }, { "type": "boolean" }] },
+    "Choice": { "type": "string", "enum": ["first", "second"], "default": "second" },
+    "RenamedChoice": { "type": "string", "enum": ["first", "in-progress"], "default": "in-progress" },
+    "NoDefault": { "type": "string", "enum": ["first", "second"] },
+    "Helpers": {
+      "type": "object",
+      "properties": {
+        "unit": { "type": "string", "enum": ["first", "second"], "default": "second" },
+        "payload": { "oneOf": [{ "type": "integer" }, { "type": "string" }], "default": "text" }
+      }
+    },
+    "Payload": { "oneOf": [{ "type": "integer" }, { "type": "string" }], "default": 7 },
+    "Tagged": {
+      "oneOf": [
+        { "type": "object", "properties": { "kind": { "enum": ["empty"] } }, "required": ["kind"], "additionalProperties": false },
+        { "type": "object", "properties": { "kind": { "enum": ["full"] }, "value": { "type": "string" } }, "required": ["kind", "value"], "additionalProperties": false }
+      ],
+      "default": { "kind": "empty" }
+    },
+    "TaggedPayload": {
+      "oneOf": [
+        { "type": "object", "properties": { "kind": { "enum": ["empty"] } }, "required": ["kind"], "additionalProperties": false },
+        { "type": "object", "properties": { "kind": { "enum": ["full"] }, "value": { "type": "string" }, "count": { "type": "integer" } }, "required": ["kind", "value", "count"], "additionalProperties": false }
+      ],
+      "default": { "kind": "full", "value": "body", "count": 2 }
+    },
+    "Label": { "type": "string" },
+    "DefaultProperty": {
+      "type": "object",
+      "properties": { "default": { "type": "string" } },
+      "required": ["default"],
+      "additionalProperties": false
+    },
+    "Nested": {
+      "type": "object",
+      "properties": { "choice": { "$ref": "#/definitions/Choice" } },
+      "required": ["choice"]
+    },
+    "Model": {
+      "type": "object",
+      "description": "Use OpenAI with field_name.\n\n```json\n{\"field_name\": \"OpenAI\"}\n```",
+      "properties": {
+        "choice": { "$ref": "#/definitions/Choice" },
+        "nested": { "$ref": "#/definitions/Nested" },
+        "label": { "$ref": "#/definitions/Label" },
+        "optional": { "type": "string", "description": "Returned field_name from OpenAI." },
+        "items": { "type": "array", "items": { "type": "string" } },
+        "mapping": { "type": "object", "additionalProperties": { "type": "integer" } }
+      },
+      "required": ["choice", "nested", "label"]
+    },
+    "Mixed": {
+      "type": "object",
+      "properties": {
+        "count": { "type": "integer", "default": 7 },
+        "optional": { "$ref": "#/definitions/Choice" },
+        "items": { "type": "array", "items": { "$ref": "#/definitions/Nested" } }
+      }
+    }
+  }
+}

@@ -59,7 +59,7 @@ pub struct Veggie {
 }
 impl Veggie {
     pub fn builder() -> builder::Veggie {
-        Default::default()
+        <builder::Veggie as ::std::default::Default>::default()
     }
 }
 #[doc = "A representation of a person, company, organization, or place"]
@@ -72,7 +72,7 @@ pub struct Veggies {
 }
 impl Veggies {
     pub fn builder() -> builder::Veggies {
-        Default::default()
+        <builder::Veggies as ::std::default::Default>::default()
     }
 }
 #[doc = " Types for composing complex structures."]
@@ -138,8 +138,8 @@ pub mod builder {
     impl ::std::default::Default for Veggies {
         fn default() -> Self {
             Self {
-                fruits: Ok(Default::default()),
-                vegetables: Ok(Default::default()),
+                fruits: Ok(<::std::vec::Vec<::std::string::String>>::default()),
+                vegetables: Ok(<::std::vec::Vec<super::Veggie>>::default()),
             }
         }
     }

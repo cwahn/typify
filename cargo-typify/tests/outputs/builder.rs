@@ -13,11 +13,16 @@ impl ::std::ops::Deref for Fruit {
         &self.0
     }
 }
-impl ::std::convert::From<Fruit>
-    for ::std::collections::HashMap<::std::string::String, ::std::string::String>
+impl<__TypifyBuildHasher: ::std::hash::BuildHasher + ::std::default::Default>
+    ::std::convert::From<Fruit>
+    for ::std::collections::HashMap<
+        ::std::string::String,
+        ::std::string::String,
+        __TypifyBuildHasher,
+    >
 {
     fn from(value: Fruit) -> Self {
-        value.0
+        value.0.into_iter().collect()
     }
 }
 impl ::std::convert::From<::std::collections::HashMap<::std::string::String, ::std::string::String>>
@@ -58,7 +63,7 @@ pub struct Veggie {
 }
 impl Veggie {
     pub fn builder() -> builder::Veggie {
-        Default::default()
+        <builder::Veggie as ::std::default::Default>::default()
     }
 }
 #[doc = "A representation of a person, company, organization, or place"]
@@ -71,7 +76,7 @@ pub struct Veggies {
 }
 impl Veggies {
     pub fn builder() -> builder::Veggies {
-        Default::default()
+        <builder::Veggies as ::std::default::Default>::default()
     }
 }
 #[doc = " Types for composing complex structures."]
@@ -137,8 +142,8 @@ pub mod builder {
     impl ::std::default::Default for Veggies {
         fn default() -> Self {
             Self {
-                fruits: Ok(Default::default()),
-                vegetables: Ok(Default::default()),
+                fruits: Ok(<::std::vec::Vec<::std::string::String>>::default()),
+                vegetables: Ok(<::std::vec::Vec<super::Veggie>>::default()),
             }
         }
     }

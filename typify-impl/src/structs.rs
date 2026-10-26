@@ -1,9 +1,13 @@
 // Copyright 2024 Oxide Computer Company
 
+use std::collections::BTreeSet;
+
 use heck::ToSnakeCase;
 use proc_macro2::TokenStream;
 use quote::quote;
-use schemars::schema::{InstanceType, Metadata, ObjectValidation, Schema, SchemaObject};
+use schemars::schema::{
+    InstanceType, Metadata, ObjectValidation, Schema, SchemaObject, SingleOrVec,
+};
 
 use crate::{
     output::{OutputSpace, OutputSpaceMod},
@@ -11,8 +15,8 @@ use crate::{
         StructProperty, StructPropertyRename, StructPropertyState, TypeEntry, TypeEntryStruct,
         WrappedValue,
     },
-    util::{get_type_name, metadata_description, recase, Case},
-    Name, Result, TypeEntryDetails, TypeId, TypeSpace,
+    util::{get_type_name, metadata_description, recase, ref_key, sanitize, Case},
+    Name, RefKey, Result, TypeEntryDetails, TypeId, TypeSpace,
 };
 
 impl TypeSpace {
@@ -273,10 +277,34 @@ impl TypeSpace {
         subschemas: &[Schema],
         optional: bool,
     ) -> Result<(TypeEntry, &'a Option<Box<Metadata>>)> {
-        let properties = subschemas
+        let names = subschemas
             .iter()
             .enumerate()
-            .map(|(idx, schema)| {
+            .map(|(idx, schema)| flattened_union_field_name(schema, idx))
+            .map(|name| {
+                // Synthetic fields also become inherent builder setters. Keep
+                // them from shadowing the builder's derived/implemented traits
+                // and standard blanket conversion, ownership, borrow, and Any
+                // methods. Real JSON properties use a separate naming path.
+                // Reserve these even when builders are disabled, so enabling
+                // builders never changes the model's synthetic field names.
+                match name.as_str() {
+                    "default" | "clone" | "clone_from" | "from" | "try_from" | "into"
+                    | "try_into" | "fmt" | "to_owned" | "clone_into" | "borrow" | "borrow_mut"
+                    | "type_id" => format!("{name}_value"),
+                    _ => name,
+                }
+            })
+            .collect::<Vec<_>>();
+        // Reserve every base name so a duplicate cannot take the name of a
+        // later branch (for example, `string`, `string`, `string_2`).
+        let reserved = names.iter().cloned().collect::<BTreeSet<_>>();
+        let mut used = BTreeSet::new();
+        let properties = subschemas
+            .iter()
+            .zip(names)
+            .enumerate()
+            .map(|(idx, (schema, base_name))| {
                 let type_name = match get_type_name(&type_name, metadata) {
                     Some(name) => Name::Suggested(format!("{}Subtype{}", name, idx)),
                     None => Name::Unknown,
@@ -287,9 +315,18 @@ impl TypeSpace {
                     type_id = self.id_to_option(&type_id);
                 }
 
-                // TODO we need a reasonable name that could be derived
-                // from the name of the type
-                let name = format!("subtype_{}", idx);
+                let name = if used.insert(base_name.clone()) {
+                    base_name
+                } else {
+                    let mut suffix = 2;
+                    loop {
+                        let name = format!("{}_{}", base_name.trim_end_matches('_'), suffix);
+                        suffix += 1;
+                        if !reserved.contains(&name) && used.insert(name.clone()) {
+                            break name;
+                        }
+                    }
+                };
 
                 Ok(StructProperty {
                     name,
@@ -317,6 +354,43 @@ impl TypeSpace {
             metadata,
         ))
     }
+}
+
+/// Name only the synthetic Rust field, never a JSON property or a suggested
+/// branch type. References may not yet have entries in the type space here, so
+/// use their schema identity rather than depending on registration order.
+fn flattened_union_field_name(schema: &Schema, idx: usize) -> String {
+    if let Schema::Object(schema) = schema {
+        // Leave malformed, external, and root references to the existing
+        // conversion path; naming must not introduce reference validation.
+        if let Some(reference) = schema
+            .reference
+            .as_deref()
+            .filter(|reference| reference.starts_with('#') && reference.contains('/'))
+        {
+            if let RefKey::Def(name) = ref_key(reference) {
+                return sanitize(&name, Case::Snake);
+            }
+        }
+        if let Some(name) = get_type_name(&Name::Unknown, &schema.metadata) {
+            return sanitize(&name, Case::Snake);
+        }
+        if let Some(SingleOrVec::Single(instance_type)) = &schema.instance_type {
+            let name = match instance_type.as_ref() {
+                InstanceType::Null => Some("null"),
+                InstanceType::Boolean => Some("boolean"),
+                InstanceType::Integer => Some("integer"),
+                InstanceType::Number => Some("number"),
+                InstanceType::String => Some("string"),
+                // Anonymous compound branches have no unambiguous type name.
+                InstanceType::Object | InstanceType::Array => None,
+            };
+            if let Some(name) = name {
+                return name.to_string();
+            }
+        }
+    }
+    format!("subtype_{}", idx)
 }
 
 pub(crate) enum DefaultFunction {
@@ -577,5 +651,100 @@ mod tests {
             output,
             "::serde_json::Map<::std::string::String,::serde_json::Value>"
         );
+    }
+
+    #[test]
+    fn flattened_field_names_leave_schema_types_and_states_identical() {
+        use crate::{
+            type_entry::{
+                StructProperty, StructPropertyRename, StructPropertyState, TypeEntryStruct,
+            },
+            TypeEntryDetails,
+        };
+
+        for optional in [false, true] {
+            let operator = if optional { "anyOf" } else { "allOf" };
+            let raw = serde_json::json!({
+                operator: [
+                    {"type": "string"},
+                    {"type": "null"},
+                    {"type": "object", "properties": {"wire-key": {"type": "boolean"}}}
+                ]
+            });
+            let original: schemars::schema::Schema = serde_json::from_value(raw.clone()).unwrap();
+            let object = original.clone().into_object();
+            let validation = object.subschemas.as_ref().unwrap();
+            let subschemas = if optional {
+                validation.any_of.as_ref().unwrap()
+            } else {
+                validation.all_of.as_ref().unwrap()
+            };
+            let name = Name::Required("Synthetic".to_string());
+            let mut space = TypeSpace::default();
+            let (mut actual, _) = space
+                .flattened_union_struct(
+                    name.clone(),
+                    &original,
+                    &object.metadata,
+                    subschemas,
+                    optional,
+                )
+                .unwrap();
+
+            // Reproduce the old index-only algorithm independently. Once the
+            // new field spellings are reverted, the entire entry (including its
+            // stored raw schema) and every registered branch must be identical.
+            let mut before = TypeSpace::default();
+            let properties = subschemas
+                .iter()
+                .enumerate()
+                .map(|(idx, schema)| {
+                    let (mut type_id, _) = before
+                        .id_for_schema(Name::Suggested(format!("SyntheticSubtype{idx}")), schema)
+                        .unwrap();
+                    if optional {
+                        type_id = before.id_to_option(&type_id);
+                    }
+                    StructProperty {
+                        name: format!("subtype_{idx}"),
+                        rename: StructPropertyRename::Flatten,
+                        state: if optional {
+                            StructPropertyState::Optional
+                        } else {
+                            StructPropertyState::Required
+                        },
+                        description: None,
+                        type_id,
+                    }
+                })
+                .collect();
+            let expected = TypeEntryStruct::from_metadata(
+                &mut before,
+                name,
+                &object.metadata,
+                properties,
+                false,
+                original.clone(),
+            );
+            let TypeEntryDetails::Struct(details) = &mut actual.details else {
+                panic!("expected struct");
+            };
+            assert_eq!(
+                details
+                    .properties
+                    .iter()
+                    .map(|property| property.name.as_str())
+                    .collect::<Vec<_>>(),
+                ["string", "null", "subtype_2"]
+            );
+            for (idx, property) in details.properties.iter_mut().enumerate() {
+                property.name = format!("subtype_{idx}");
+            }
+            assert_eq!(actual, expected);
+            assert_eq!(space.id_to_entry, before.id_to_entry);
+            assert_eq!(space.name_to_id, before.name_to_id);
+            assert_eq!(space.type_to_id, before.type_to_id);
+            assert_eq!(serde_json::to_value(original).unwrap(), raw);
+        }
     }
 }

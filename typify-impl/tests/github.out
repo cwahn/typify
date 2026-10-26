@@ -2,7 +2,7 @@
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct AlertInstance {
-    #[doc = "Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name."]
+    #[doc = "Identifies the configuration under which the analysis was executed. For example, in `GitHub` Actions this includes the workflow filename and job name."]
     pub analysis_key: ::std::string::String,
     #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub classifications: ::std::vec::Vec<::std::string::String>,
@@ -97,27 +97,27 @@ impl ::std::convert::TryFrom<::std::string::String> for AlertInstanceState {
         value.parse()
     }
 }
-#[doc = "GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub."]
+#[doc = "`GitHub` apps are a new way to extend `GitHub`. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. `GitHub` apps are first class actors within `GitHub`."]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct App {
     pub created_at: ::chrono::DateTime<::chrono::offset::Utc>,
     #[serde(deserialize_with = "::std::option::Option::deserialize")]
     pub description: ::std::option::Option<::std::string::String>,
-    #[doc = "The list of events for the GitHub app"]
+    #[doc = "The list of events for the `GitHub` app"]
     #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub events: ::std::vec::Vec<AppEventsItem>,
     pub external_url: ::std::string::String,
     pub html_url: ::std::string::String,
-    #[doc = "Unique identifier of the GitHub app"]
+    #[doc = "Unique identifier of the `GitHub` app"]
     pub id: i64,
-    #[doc = "The name of the GitHub app"]
+    #[doc = "The name of the `GitHub` app"]
     pub name: ::std::string::String,
     pub node_id: ::std::string::String,
     pub owner: User,
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
     pub permissions: ::std::option::Option<AppPermissions>,
-    #[doc = "The slug name of the GitHub app"]
+    #[doc = "The slug name of the `GitHub` app"]
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
     pub slug: ::std::option::Option<::std::string::String>,
     pub updated_at: ::chrono::DateTime<::chrono::offset::Utc>,
@@ -341,7 +341,7 @@ impl ::std::convert::TryFrom<::std::string::String> for AppEventsItem {
         value.parse()
     }
 }
-#[doc = "The set of permissions for the GitHub app"]
+#[doc = "The set of permissions for the `GitHub` app"]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, Default)]
 #[serde(deny_unknown_fields)]
 pub struct AppPermissions {
@@ -3799,7 +3799,7 @@ pub struct CheckRunCreatedRequestedAction {
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
     pub identifier: ::std::option::Option<::std::string::String>,
 }
-#[doc = "A deployment to a repository environment. This will only be populated if the check run was created by a GitHub Actions workflow job that references an environment."]
+#[doc = "A deployment to a repository environment. This will only be populated if the check run was created by a `GitHub` Actions workflow job that references an environment."]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct CheckRunDeployment {
@@ -5427,7 +5427,7 @@ pub struct CodeScanningAlertAppearedInBranchAlert {
     #[serde(deserialize_with = "::std::option::Option::deserialize")]
     pub dismissed_reason:
         ::std::option::Option<CodeScanningAlertAppearedInBranchAlertDismissedReason>,
-    #[doc = "The GitHub URL of the alert resource."]
+    #[doc = "The `GitHub` URL of the alert resource."]
     pub html_url: ::std::string::String,
     pub instances: ::std::vec::Vec<AlertInstance>,
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
@@ -5714,7 +5714,7 @@ pub struct CodeScanningAlertClosedByUserAlert {
     #[doc = "The reason for dismissing or closing the alert. Can be one of: `false positive`, `won't fix`, and `used in tests`."]
     #[serde(deserialize_with = "::std::option::Option::deserialize")]
     pub dismissed_reason: ::std::option::Option<CodeScanningAlertClosedByUserAlertDismissedReason>,
-    #[doc = "The GitHub URL of the alert resource."]
+    #[doc = "The `GitHub` URL of the alert resource."]
     pub html_url: ::std::string::String,
     pub instances: ::std::vec::Vec<CodeScanningAlertClosedByUserAlertInstancesItem>,
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
@@ -5788,7 +5788,7 @@ impl ::std::convert::TryFrom<::std::string::String>
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct CodeScanningAlertClosedByUserAlertInstancesItem {
-    #[doc = "Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name."]
+    #[doc = "Identifies the configuration under which the analysis was executed. For example, in `GitHub` Actions this includes the workflow filename and job name."]
     pub analysis_key: ::std::string::String,
     #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub classifications: ::std::vec::Vec<::std::string::String>,
@@ -6092,7 +6092,7 @@ pub struct CodeScanningAlertCreatedAlert {
     pub dismissed_by: (),
     #[doc = "The reason for dismissing or closing the alert. Can be one of: `false positive`, `won't fix`, and `used in tests`."]
     pub dismissed_reason: (),
-    #[doc = "The GitHub URL of the alert resource."]
+    #[doc = "The `GitHub` URL of the alert resource."]
     pub html_url: ::std::string::String,
     pub instances: ::std::vec::Vec<CodeScanningAlertCreatedAlertInstancesItem>,
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
@@ -6109,7 +6109,7 @@ pub struct CodeScanningAlertCreatedAlert {
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct CodeScanningAlertCreatedAlertInstancesItem {
-    #[doc = "Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name."]
+    #[doc = "Identifies the configuration under which the analysis was executed. For example, in `GitHub` Actions this includes the workflow filename and job name."]
     pub analysis_key: ::std::string::String,
     #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub classifications: ::std::vec::Vec<::std::string::String>,
@@ -6463,7 +6463,7 @@ pub struct CodeScanningAlertFixedAlert {
     #[doc = "The reason for dismissing or closing the alert. Can be one of: `false positive`, `won't fix`, and `used in tests`."]
     #[serde(deserialize_with = "::std::option::Option::deserialize")]
     pub dismissed_reason: ::std::option::Option<CodeScanningAlertFixedAlertDismissedReason>,
-    #[doc = "The GitHub URL of the alert resource."]
+    #[doc = "The `GitHub` URL of the alert resource."]
     pub html_url: ::std::string::String,
     pub instances: ::std::vec::Vec<CodeScanningAlertFixedAlertInstancesItem>,
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
@@ -6537,7 +6537,7 @@ impl ::std::convert::TryFrom<::std::string::String> for CodeScanningAlertFixedAl
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct CodeScanningAlertFixedAlertInstancesItem {
-    #[doc = "Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name."]
+    #[doc = "Identifies the configuration under which the analysis was executed. For example, in `GitHub` Actions this includes the workflow filename and job name."]
     pub analysis_key: ::std::string::String,
     #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub classifications: ::std::vec::Vec<::std::string::String>,
@@ -6839,7 +6839,7 @@ pub struct CodeScanningAlertReopenedAlert {
     pub dismissed_by: (),
     #[doc = "The reason for dismissing or closing the alert. Can be one of: `false positive`, `won't fix`, and `used in tests`."]
     pub dismissed_reason: (),
-    #[doc = "The GitHub URL of the alert resource."]
+    #[doc = "The `GitHub` URL of the alert resource."]
     pub html_url: ::std::string::String,
     pub instances: ::std::vec::Vec<CodeScanningAlertReopenedAlertInstancesItem>,
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
@@ -6856,7 +6856,7 @@ pub struct CodeScanningAlertReopenedAlert {
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct CodeScanningAlertReopenedAlertInstancesItem {
-    #[doc = "Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name."]
+    #[doc = "Identifies the configuration under which the analysis was executed. For example, in `GitHub` Actions this includes the workflow filename and job name."]
     pub analysis_key: ::std::string::String,
     #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub classifications: ::std::vec::Vec<::std::string::String>,
@@ -7166,7 +7166,7 @@ pub struct CodeScanningAlertReopenedByUserAlert {
     pub dismissed_by: (),
     #[doc = "The reason for dismissing or closing the alert. Can be one of: `false positive`, `won't fix`, and `used in tests`."]
     pub dismissed_reason: (),
-    #[doc = "The GitHub URL of the alert resource."]
+    #[doc = "The `GitHub` URL of the alert resource."]
     pub html_url: ::std::string::String,
     pub instances: ::std::vec::Vec<CodeScanningAlertReopenedByUserAlertInstancesItem>,
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
@@ -7183,7 +7183,7 @@ pub struct CodeScanningAlertReopenedByUserAlert {
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct CodeScanningAlertReopenedByUserAlertInstancesItem {
-    #[doc = "Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name."]
+    #[doc = "Identifies the configuration under which the analysis was executed. For example, in `GitHub` Actions this includes the workflow filename and job name."]
     pub analysis_key: ::std::string::String,
     #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
     pub classifications: ::std::vec::Vec<::std::string::String>,
@@ -10539,9 +10539,9 @@ impl ::std::fmt::Display for ForkEventForkeeCreatedAt {
 impl ::std::str::FromStr for ForkEventForkeeCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -10784,7 +10784,7 @@ impl ::std::convert::TryFrom<::std::string::String> for GollumEventPagesItemActi
         value.parse()
     }
 }
-#[doc = "The GitHub App installation."]
+#[doc = "The `GitHub` App installation."]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Installation {
@@ -10895,9 +10895,9 @@ impl ::std::fmt::Display for InstallationCreatedAt {
 impl ::std::str::FromStr for InstallationCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -13698,9 +13698,9 @@ impl ::std::fmt::Display for InstallationSuspendInstallationCreatedAt {
 impl ::std::str::FromStr for InstallationSuspendInstallationCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -16134,9 +16134,9 @@ impl ::std::fmt::Display for InstallationSuspendInstallationUpdatedAt {
 impl ::std::str::FromStr for InstallationSuspendInstallationUpdatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -16340,9 +16340,9 @@ impl ::std::fmt::Display for InstallationUnsuspendInstallationCreatedAt {
 impl ::std::str::FromStr for InstallationUnsuspendInstallationCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -18710,9 +18710,9 @@ impl ::std::fmt::Display for InstallationUnsuspendInstallationUpdatedAt {
 impl ::std::str::FromStr for InstallationUnsuspendInstallationUpdatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -18776,9 +18776,9 @@ impl ::std::fmt::Display for InstallationUpdatedAt {
 impl ::std::str::FromStr for InstallationUpdatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -23815,7 +23815,7 @@ impl ::std::convert::TryFrom<::std::string::String> for MetaDeletedAction {
         value.parse()
     }
 }
-#[doc = "The modified webhook. This will contain different keys based on the type of webhook it is: repository, organization, business, app, or GitHub Marketplace."]
+#[doc = "The modified webhook. This will contain different keys based on the type of webhook it is: repository, organization, business, app, or `GitHub` Marketplace."]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct MetaDeletedHook {
@@ -25434,7 +25434,7 @@ pub struct PingEvent {
 #[serde(deny_unknown_fields)]
 pub struct PingEventHook {
     pub active: bool,
-    #[doc = "When you register a new GitHub App, GitHub sends a ping event to the **webhook URL** you specified during registration. The event contains the `app_id`, which is required for [authenticating](https://docs.github.com/en/apps/building-integrations/setting-up-and-registering-github-apps/about-authentication-options-for-github-apps) an app."]
+    #[doc = "When you register a new `GitHub` App, `GitHub` sends a ping event to the **webhook URL** you specified during registration. The event contains the `app_id`, which is required for [authenticating](https://docs.github.com/en/apps/building-integrations/setting-up-and-registering-github-apps/about-authentication-options-for-github-apps) an app."]
     #[serde(skip_serializing_if = "::std::option::Option::is_none")]
     pub app_id: ::std::option::Option<i64>,
     pub config: PingEventHookConfig,
@@ -26820,9 +26820,9 @@ impl ::std::fmt::Display for PublicEventRepositoryCreatedAt {
 impl ::std::str::FromStr for PublicEventRepositoryCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -31999,9 +31999,9 @@ impl ::std::fmt::Display for RepositoryArchivedRepositoryCreatedAt {
 impl ::std::str::FromStr for RepositoryArchivedRepositoryCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -32143,9 +32143,9 @@ impl ::std::fmt::Display for RepositoryCreatedAt {
 impl ::std::str::FromStr for RepositoryCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -32797,9 +32797,9 @@ impl ::std::fmt::Display for RepositoryPrivatizedRepositoryCreatedAt {
 impl ::std::str::FromStr for RepositoryPrivatizedRepositoryCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -33062,9 +33062,9 @@ impl ::std::fmt::Display for RepositoryPublicizedRepositoryCreatedAt {
 impl ::std::str::FromStr for RepositoryPublicizedRepositoryCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -33502,9 +33502,9 @@ impl ::std::fmt::Display for RepositoryUnarchivedRepositoryCreatedAt {
 impl ::std::str::FromStr for RepositoryUnarchivedRepositoryCreatedAt {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<i64>() {
             Ok(Self::Integer(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<::chrono::DateTime<::chrono::offset::Utc>>() {
             Ok(Self::DateTime(v))
         } else {
             Err("string conversion failed for all variants".into())

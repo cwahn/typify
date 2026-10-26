@@ -18,7 +18,7 @@ use crate::{
     },
     util::{
         constant_string_value, get_object, get_type_name, metadata_description,
-        metadata_title_and_description, schema_is_named,
+        metadata_title_and_description, render_doc_markdown, schema_is_named,
     },
     Name, Result, TypeSpace,
 };
@@ -764,6 +764,7 @@ pub(crate) fn output_variant(
     let ident_name = variant.ident_name.as_ref().unwrap();
     let variant_name = format_ident!("{}", ident_name);
     let doc = variant.description.as_ref().map(|s| {
+        let s = render_doc_markdown(s);
         quote! { #[doc = #s] }
     });
     let serde = (&variant.raw_name != ident_name).then(|| {
@@ -820,7 +821,10 @@ pub(crate) fn output_variant(
 
         VariantDetails::Struct(props) => {
             let prop_streams = props.iter().map(|prop| {
-                let prop_doc = prop.description.as_ref().map(|s| quote! { #[doc = #s] });
+                let prop_doc = prop.description.as_ref().map(|s| {
+                    let s = render_doc_markdown(s);
+                    quote! { #[doc = #s] }
+                });
 
                 let prop_type_entry = type_space.id_to_entry.get(&prop.type_id).unwrap();
                 let (prop_serde, _) = generate_serde_attr(

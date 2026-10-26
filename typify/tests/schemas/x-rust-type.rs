@@ -9,7 +9,7 @@ pub struct AllTheThings {
 }
 impl AllTheThings {
     pub fn builder() -> builder::AllTheThings {
-        Default::default()
+        <builder::AllTheThings as ::std::default::Default>::default()
     }
 }
 #[doc = "`Marker`"]
@@ -43,8 +43,10 @@ pub mod builder {
     impl ::std::default::Default for AllTheThings {
         fn default() -> Self {
             Self {
-                option_marker: Ok(Default::default()),
-                path: Ok(Default::default()),
+                option_marker: Ok(
+                    <::std::option::Option<::std::option::Option<super::Marker>>>::default(),
+                ),
+                path: Ok(<::std::option::Option<::std::path::PathBuf>>::default()),
             }
         }
     }

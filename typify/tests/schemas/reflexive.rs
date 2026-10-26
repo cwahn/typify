@@ -9,7 +9,7 @@ pub struct Node {
 }
 impl Node {
     pub fn builder() -> builder::Node {
-        Default::default()
+        <builder::Node as ::std::default::Default>::default()
     }
 }
 #[doc = " Types for composing complex structures."]
@@ -22,8 +22,8 @@ pub mod builder {
     impl ::std::default::Default for Node {
         fn default() -> Self {
             Self {
-                children: Ok(Default::default()),
-                value: Ok(Default::default()),
+                children: Ok(<::std::vec::Vec<super::Node>>::default()),
+                value: Ok(<::std::option::Option<i64>>::default()),
             }
         }
     }

@@ -21,6 +21,7 @@ use type_entry::{
 use crate::util::{sanitize, Case};
 
 pub use crate::util::accept_as_ident;
+pub use crate::util::render_doc_markdown;
 
 #[cfg(test)]
 mod test_util;

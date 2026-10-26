@@ -6,7 +6,7 @@ pub struct Box {
 }
 impl Box {
     pub fn builder() -> builder::Box {
-        Default::default()
+        <builder::Box as ::std::default::Default>::default()
     }
 }
 #[doc = "`Copy`"]
@@ -16,7 +16,7 @@ pub struct Copy {
 }
 impl Copy {
     pub fn builder() -> builder::Copy {
-        Default::default()
+        <builder::Copy as ::std::default::Default>::default()
     }
 }
 #[doc = "`DoubleOptionCollision`"]
@@ -27,7 +27,7 @@ pub struct DoubleOptionCollision {
 }
 impl DoubleOptionCollision {
     pub fn builder() -> builder::DoubleOptionCollision {
-        Default::default()
+        <builder::DoubleOptionCollision as ::std::default::Default>::default()
     }
 }
 #[doc = "`DoubleOptionCollisionOption`"]
@@ -38,7 +38,7 @@ pub struct DoubleOptionCollisionOption {
 }
 impl DoubleOptionCollisionOption {
     pub fn builder() -> builder::DoubleOptionCollisionOption {
-        Default::default()
+        <builder::DoubleOptionCollisionOption as ::std::default::Default>::default()
     }
 }
 #[doc = "`Drop`"]
@@ -48,7 +48,7 @@ pub struct Drop {
 }
 impl Drop {
     pub fn builder() -> builder::Drop {
-        Default::default()
+        <builder::Drop as ::std::default::Default>::default()
     }
 }
 #[doc = "`FlattenedKeywords`"]
@@ -60,7 +60,7 @@ pub struct FlattenedKeywords {
 }
 impl FlattenedKeywords {
     pub fn builder() -> builder::FlattenedKeywords {
-        Default::default()
+        <builder::FlattenedKeywords as ::std::default::Default>::default()
     }
 }
 #[doc = "`FormatCollision`"]
@@ -155,7 +155,7 @@ pub struct MapOfKeywords {
 }
 impl MapOfKeywords {
     pub fn builder() -> builder::MapOfKeywords {
-        Default::default()
+        <builder::MapOfKeywords as ::std::default::Default>::default()
     }
 }
 #[doc = "`MapOfKeywordsKeywordMapValue`"]
@@ -268,7 +268,7 @@ pub struct NestedTypeCollisions {
 }
 impl NestedTypeCollisions {
     pub fn builder() -> builder::NestedTypeCollisions {
-        Default::default()
+        <builder::NestedTypeCollisions as ::std::default::Default>::default()
     }
 }
 #[doc = "`NestedTypeCollisionsOptionType`"]
@@ -282,7 +282,7 @@ pub struct NestedTypeCollisionsOptionType {
 }
 impl NestedTypeCollisionsOptionType {
     pub fn builder() -> builder::NestedTypeCollisionsOptionType {
-        Default::default()
+        <builder::NestedTypeCollisionsOptionType as ::std::default::Default>::default()
     }
 }
 #[doc = "`Option`"]
@@ -292,7 +292,7 @@ pub struct Option {
 }
 impl Option {
     pub fn builder() -> builder::Option {
-        Default::default()
+        <builder::Option as ::std::default::Default>::default()
     }
 }
 #[doc = "`Pin`"]
@@ -302,7 +302,7 @@ pub struct Pin {
 }
 impl Pin {
     pub fn builder() -> builder::Pin {
-        Default::default()
+        <builder::Pin as ::std::default::Default>::default()
     }
 }
 #[doc = "`RustKeywordMonster`"]
@@ -413,7 +413,7 @@ pub struct RustKeywordMonster {
 }
 impl RustKeywordMonster {
     pub fn builder() -> builder::RustKeywordMonster {
-        Default::default()
+        <builder::RustKeywordMonster as ::std::default::Default>::default()
     }
 }
 #[doc = "`Send`"]
@@ -423,7 +423,7 @@ pub struct Send {
 }
 impl Send {
     pub fn builder() -> builder::Send {
-        Default::default()
+        <builder::Send as ::std::default::Default>::default()
     }
 }
 #[doc = "`Std`"]
@@ -439,7 +439,7 @@ pub struct Std {
 }
 impl Std {
     pub fn builder() -> builder::Std {
-        Default::default()
+        <builder::Std as ::std::default::Default>::default()
     }
 }
 #[doc = "`StdBoxed`"]
@@ -449,7 +449,7 @@ pub struct StdBoxed {
 }
 impl StdBoxed {
     pub fn builder() -> builder::StdBoxed {
-        Default::default()
+        <builder::StdBoxed as ::std::default::Default>::default()
     }
 }
 #[doc = "`StdConvert`"]
@@ -459,7 +459,7 @@ pub struct StdConvert {
 }
 impl StdConvert {
     pub fn builder() -> builder::StdConvert {
-        Default::default()
+        <builder::StdConvert as ::std::default::Default>::default()
     }
 }
 #[doc = "`StdFmt`"]
@@ -469,7 +469,7 @@ pub struct StdFmt {
 }
 impl StdFmt {
     pub fn builder() -> builder::StdFmt {
-        Default::default()
+        <builder::StdFmt as ::std::default::Default>::default()
     }
 }
 #[doc = "`StdOption`"]
@@ -479,7 +479,7 @@ pub struct StdOption {
 }
 impl StdOption {
     pub fn builder() -> builder::StdOption {
-        Default::default()
+        <builder::StdOption as ::std::default::Default>::default()
     }
 }
 #[doc = "`StdResult`"]
@@ -489,7 +489,7 @@ pub struct StdResult {
 }
 impl StdResult {
     pub fn builder() -> builder::StdResult {
-        Default::default()
+        <builder::StdResult as ::std::default::Default>::default()
     }
 }
 #[doc = "`StdStr`"]
@@ -499,7 +499,7 @@ pub struct StdStr {
 }
 impl StdStr {
     pub fn builder() -> builder::StdStr {
-        Default::default()
+        <builder::StdStr as ::std::default::Default>::default()
     }
 }
 #[doc = "`StdString`"]
@@ -509,7 +509,7 @@ pub struct StdString {
 }
 impl StdString {
     pub fn builder() -> builder::StdString {
-        Default::default()
+        <builder::StdString as ::std::default::Default>::default()
     }
 }
 #[doc = "`String`"]
@@ -519,7 +519,7 @@ pub struct String {
 }
 impl String {
     pub fn builder() -> builder::String {
-        Default::default()
+        <builder::String as ::std::default::Default>::default()
     }
 }
 #[doc = "`StringEnum`"]
@@ -637,7 +637,7 @@ pub struct Sync {
 }
 impl Sync {
     pub fn builder() -> builder::Sync {
-        Default::default()
+        <builder::Sync as ::std::default::Default>::default()
     }
 }
 #[doc = "`TestSchemaWithVariousDefinitionsTypeNamesAndPropertiesThatLikelyConflictWithBuiltInRustTypesAndKeywords`"]
@@ -658,7 +658,7 @@ pub struct TypeWithOptionField {
 }
 impl TypeWithOptionField {
     pub fn builder() -> builder::TypeWithOptionField {
-        Default::default()
+        <builder::TypeWithOptionField as ::std::default::Default>::default()
     }
 }
 #[doc = "`Vec`"]
@@ -668,7 +668,7 @@ pub struct Vec {
 }
 impl Vec {
     pub fn builder() -> builder::Vec {
-        Default::default()
+        <builder::Vec as ::std::default::Default>::default()
     }
 }
 #[doc = " Types for composing complex structures."]
@@ -757,7 +757,7 @@ pub mod builder {
     impl ::std::default::Default for DoubleOptionCollision {
         fn default() -> Self {
             Self {
-                option: Ok(Default::default()),
+                option: Ok(<::std::option::Option<super::DoubleOptionCollisionOption>>::default()),
             }
         }
     }
@@ -800,7 +800,7 @@ pub mod builder {
     impl ::std::default::Default for DoubleOptionCollisionOption {
         fn default() -> Self {
             Self {
-                option: Ok(Default::default()),
+                option: Ok(<::std::option::Option<::std::string::String>>::default()),
             }
         }
     }
@@ -993,7 +993,9 @@ pub mod builder {
     impl ::std::default::Default for NestedTypeCollisions {
         fn default() -> Self {
             Self {
-                option_type: Ok(Default::default()),
+                option_type: Ok(
+                    <::std::option::Option<super::NestedTypeCollisionsOptionType>>::default(),
+                ),
                 type_: Err("no value supplied for type_".to_string()),
                 types: Err("no value supplied for types".to_string()),
             }
@@ -1064,7 +1066,7 @@ pub mod builder {
     impl ::std::default::Default for NestedTypeCollisionsOptionType {
         fn default() -> Self {
             Self {
-                type_: Ok(Default::default()),
+                type_: Ok(<::std::option::Option<::std::string::String>>::default()),
             }
         }
     }
@@ -2435,7 +2437,7 @@ pub mod builder {
         fn default() -> Self {
             Self {
                 boxed_field: Err("no value supplied for boxed_field".to_string()),
-                optional_field: Ok(Default::default()),
+                optional_field: Ok(<::std::option::Option<::std::string::String>>::default()),
             }
         }
     }

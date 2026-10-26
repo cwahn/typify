@@ -77,7 +77,7 @@ pub enum AggregateTransformDrop {
 }
 impl ::std::default::Default for AggregateTransformDrop {
     fn default() -> Self {
-        AggregateTransformDrop::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for AggregateTransformDrop {
@@ -575,9 +575,9 @@ impl ::std::fmt::Display for AlignValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for AlignValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -762,9 +762,9 @@ impl ::std::fmt::Display for AlignValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for AlignValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -978,9 +978,9 @@ impl ::std::fmt::Display for AnchorValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for AnchorValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -1165,9 +1165,9 @@ impl ::std::fmt::Display for AnchorValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for AnchorValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -1324,9 +1324,9 @@ impl ::std::fmt::Display for AnyValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for AnyValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -1454,9 +1454,9 @@ impl ::std::fmt::Display for AnyValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for AnyValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -1630,9 +1630,9 @@ impl ::std::fmt::Display for ArrayValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for ArrayValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -1762,9 +1762,9 @@ impl ::std::fmt::Display for ArrayValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for ArrayValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -1971,6 +1971,7 @@ impl ::std::convert::TryFrom<::std::string::String> for AutosizeVariant1Contains
     Clone,
     Copy,
     Debug,
+    Default,
     Eq,
     Hash,
     Ord,
@@ -1978,6 +1979,7 @@ impl ::std::convert::TryFrom<::std::string::String> for AutosizeVariant1Contains
     PartialOrd,
 )]
 pub enum AutosizeVariant1Type {
+    #[default]
     #[serde(rename = "pad")]
     Pad,
     #[serde(rename = "fit")]
@@ -2025,11 +2027,6 @@ impl ::std::convert::TryFrom<::std::string::String> for AutosizeVariant1Type {
         value: ::std::string::String,
     ) -> ::std::result::Result<Self, self::error::ConversionError> {
         value.parse()
-    }
-}
-impl ::std::default::Default for AutosizeVariant1Type {
-    fn default() -> Self {
-        AutosizeVariant1Type::Pad
     }
 }
 #[doc = "`Axis`"]
@@ -3923,9 +3920,9 @@ impl ::std::fmt::Display for BaseColorValueVariant0Variant0Variant3Range {
 impl ::std::str::FromStr for BaseColorValueVariant0Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -4174,9 +4171,9 @@ impl ::std::fmt::Display for BaselineValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for BaselineValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -4365,9 +4362,9 @@ impl ::std::fmt::Display for BaselineValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for BaselineValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -4489,7 +4486,7 @@ pub enum BinTransformAs {
 }
 impl ::std::default::Default for BinTransformAs {
     fn default() -> Self {
-        BinTransformAs::Array([
+        Self::Array([
             BinTransformAsArrayItem::String("bin0".to_string()),
             BinTransformAsArrayItem::String("bin1".to_string()),
         ])
@@ -4526,7 +4523,7 @@ pub enum BinTransformBase {
 }
 impl ::std::default::Default for BinTransformBase {
     fn default() -> Self {
-        BinTransformBase::Number(10_f64)
+        Self::Number(10_f64)
     }
 }
 impl ::std::convert::From<f64> for BinTransformBase {
@@ -4548,7 +4545,7 @@ pub enum BinTransformDivide {
 }
 impl ::std::default::Default for BinTransformDivide {
     fn default() -> Self {
-        BinTransformDivide::Array(vec![
+        Self::Array(vec![
             BinTransformDivideArrayItem::Number(5_f64),
             BinTransformDivideArrayItem::Number(2_f64),
         ])
@@ -4647,7 +4644,7 @@ pub enum BinTransformInterval {
 }
 impl ::std::default::Default for BinTransformInterval {
     fn default() -> Self {
-        BinTransformInterval::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for BinTransformInterval {
@@ -4669,7 +4666,7 @@ pub enum BinTransformMaxbins {
 }
 impl ::std::default::Default for BinTransformMaxbins {
     fn default() -> Self {
-        BinTransformMaxbins::Number(20_f64)
+        Self::Number(20_f64)
     }
 }
 impl ::std::convert::From<f64> for BinTransformMaxbins {
@@ -4720,7 +4717,7 @@ pub enum BinTransformNice {
 }
 impl ::std::default::Default for BinTransformNice {
     fn default() -> Self {
-        BinTransformNice::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for BinTransformNice {
@@ -5295,9 +5292,9 @@ impl ::std::fmt::Display for BlendValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for BlendValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -5531,9 +5528,9 @@ impl ::std::fmt::Display for BlendValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for BlendValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -5707,9 +5704,9 @@ impl ::std::fmt::Display for BooleanValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for BooleanValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -5839,9 +5836,9 @@ impl ::std::fmt::Display for BooleanValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for BooleanValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -6183,7 +6180,7 @@ pub enum ContourTransformSmooth {
 }
 impl ::std::default::Default for ContourTransformSmooth {
     fn default() -> Self {
-        ContourTransformSmooth::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for ContourTransformSmooth {
@@ -6411,7 +6408,7 @@ pub enum CountpatternTransformAs {
 }
 impl ::std::default::Default for CountpatternTransformAs {
     fn default() -> Self {
-        CountpatternTransformAs::Array([
+        Self::Array([
             CountpatternTransformAsArrayItem::String("text".to_string()),
             CountpatternTransformAsArrayItem::String("count".to_string()),
         ])
@@ -6448,7 +6445,7 @@ pub enum CountpatternTransformCase {
 }
 impl ::std::default::Default for CountpatternTransformCase {
     fn default() -> Self {
-        CountpatternTransformCase::Variant0(CountpatternTransformCaseVariant0::Mixed)
+        Self::Variant0(CountpatternTransformCaseVariant0::Mixed)
     }
 }
 impl ::std::convert::From<CountpatternTransformCaseVariant0> for CountpatternTransformCase {
@@ -6548,7 +6545,7 @@ pub enum CountpatternTransformPattern {
 }
 impl ::std::default::Default for CountpatternTransformPattern {
     fn default() -> Self {
-        CountpatternTransformPattern::String("[\\w\"]+".to_string())
+        Self::String("[\\w\"]+".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for CountpatternTransformPattern {
@@ -6637,7 +6634,7 @@ pub enum CrossTransformAs {
 }
 impl ::std::default::Default for CrossTransformAs {
     fn default() -> Self {
-        CrossTransformAs::Array([
+        Self::Array([
             CrossTransformAsArrayItem::String("a".to_string()),
             CrossTransformAsArrayItem::String("b".to_string()),
         ])
@@ -7034,9 +7031,12 @@ impl ::std::fmt::Display for DataVariant2FormatVariant0Subtype0ParseVariant1Valu
 impl ::std::str::FromStr for DataVariant2FormatVariant0Subtype0ParseVariant1Value {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<DataVariant2FormatVariant0Subtype0ParseVariant1ValueVariant0>()
+        {
             Ok(Self::Variant0(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) =
+            value.parse::<DataVariant2FormatVariant0Subtype0ParseVariant1ValueVariant1>()
+        {
             Ok(Self::Variant1(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -7321,9 +7321,12 @@ impl ::std::fmt::Display for DataVariant2FormatVariant0Subtype1ParseVariant1Valu
 impl ::std::str::FromStr for DataVariant2FormatVariant0Subtype1ParseVariant1Value {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<DataVariant2FormatVariant0Subtype1ParseVariant1ValueVariant0>()
+        {
             Ok(Self::Variant0(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) =
+            value.parse::<DataVariant2FormatVariant0Subtype1ParseVariant1ValueVariant1>()
+        {
             Ok(Self::Variant1(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -7650,9 +7653,12 @@ impl ::std::fmt::Display for DataVariant2FormatVariant0Subtype2ParseVariant1Valu
 impl ::std::str::FromStr for DataVariant2FormatVariant0Subtype2ParseVariant1Value {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<DataVariant2FormatVariant0Subtype2ParseVariant1ValueVariant0>()
+        {
             Ok(Self::Variant0(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) =
+            value.parse::<DataVariant2FormatVariant0Subtype2ParseVariant1ValueVariant1>()
+        {
             Ok(Self::Variant1(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -7984,9 +7990,12 @@ impl ::std::fmt::Display for DataVariant2FormatVariant0Subtype3ParseVariant1Valu
 impl ::std::str::FromStr for DataVariant2FormatVariant0Subtype3ParseVariant1Value {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<DataVariant2FormatVariant0Subtype3ParseVariant1ValueVariant0>()
+        {
             Ok(Self::Variant0(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) =
+            value.parse::<DataVariant2FormatVariant0Subtype3ParseVariant1ValueVariant1>()
+        {
             Ok(Self::Variant1(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -8508,9 +8517,12 @@ impl ::std::fmt::Display for DataVariant3FormatVariant0Subtype0ParseVariant1Valu
 impl ::std::str::FromStr for DataVariant3FormatVariant0Subtype0ParseVariant1Value {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<DataVariant3FormatVariant0Subtype0ParseVariant1ValueVariant0>()
+        {
             Ok(Self::Variant0(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) =
+            value.parse::<DataVariant3FormatVariant0Subtype0ParseVariant1ValueVariant1>()
+        {
             Ok(Self::Variant1(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -8795,9 +8807,12 @@ impl ::std::fmt::Display for DataVariant3FormatVariant0Subtype1ParseVariant1Valu
 impl ::std::str::FromStr for DataVariant3FormatVariant0Subtype1ParseVariant1Value {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<DataVariant3FormatVariant0Subtype1ParseVariant1ValueVariant0>()
+        {
             Ok(Self::Variant0(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) =
+            value.parse::<DataVariant3FormatVariant0Subtype1ParseVariant1ValueVariant1>()
+        {
             Ok(Self::Variant1(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -9124,9 +9139,12 @@ impl ::std::fmt::Display for DataVariant3FormatVariant0Subtype2ParseVariant1Valu
 impl ::std::str::FromStr for DataVariant3FormatVariant0Subtype2ParseVariant1Value {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<DataVariant3FormatVariant0Subtype2ParseVariant1ValueVariant0>()
+        {
             Ok(Self::Variant0(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) =
+            value.parse::<DataVariant3FormatVariant0Subtype2ParseVariant1ValueVariant1>()
+        {
             Ok(Self::Variant1(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -9458,9 +9476,12 @@ impl ::std::fmt::Display for DataVariant3FormatVariant0Subtype3ParseVariant1Valu
 impl ::std::str::FromStr for DataVariant3FormatVariant0Subtype3ParseVariant1Value {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<DataVariant3FormatVariant0Subtype3ParseVariant1ValueVariant0>()
+        {
             Ok(Self::Variant0(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) =
+            value.parse::<DataVariant3FormatVariant0Subtype3ParseVariant1ValueVariant1>()
+        {
             Ok(Self::Variant1(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -9888,7 +9909,7 @@ pub enum DensityTransformAs {
 }
 impl ::std::default::Default for DensityTransformAs {
     fn default() -> Self {
-        DensityTransformAs::Array(vec![
+        Self::Array(vec![
             DensityTransformAsArrayItem::String("value".to_string()),
             DensityTransformAsArrayItem::String("density".to_string()),
         ])
@@ -10025,7 +10046,7 @@ pub enum DensityTransformDistributionMax {
 }
 impl ::std::default::Default for DensityTransformDistributionMax {
     fn default() -> Self {
-        DensityTransformDistributionMax::Number(1_f64)
+        Self::Number(1_f64)
     }
 }
 impl ::std::convert::From<f64> for DensityTransformDistributionMax {
@@ -10081,7 +10102,7 @@ pub enum DensityTransformDistributionStdev {
 }
 impl ::std::default::Default for DensityTransformDistributionStdev {
     fn default() -> Self {
-        DensityTransformDistributionStdev::Number(1_f64)
+        Self::Number(1_f64)
     }
 }
 impl ::std::convert::From<f64> for DensityTransformDistributionStdev {
@@ -10173,7 +10194,7 @@ pub enum DensityTransformMaxsteps {
 }
 impl ::std::default::Default for DensityTransformMaxsteps {
     fn default() -> Self {
-        DensityTransformMaxsteps::Number(200_f64)
+        Self::Number(200_f64)
     }
 }
 impl ::std::convert::From<f64> for DensityTransformMaxsteps {
@@ -10195,7 +10216,7 @@ pub enum DensityTransformMethod {
 }
 impl ::std::default::Default for DensityTransformMethod {
     fn default() -> Self {
-        DensityTransformMethod::String("pdf".to_string())
+        Self::String("pdf".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for DensityTransformMethod {
@@ -10212,7 +10233,7 @@ pub enum DensityTransformMinsteps {
 }
 impl ::std::default::Default for DensityTransformMinsteps {
     fn default() -> Self {
-        DensityTransformMinsteps::Number(25_f64)
+        Self::Number(25_f64)
     }
 }
 impl ::std::convert::From<f64> for DensityTransformMinsteps {
@@ -10438,9 +10459,9 @@ impl ::std::fmt::Display for DirectionValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for DirectionValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -10623,9 +10644,9 @@ impl ::std::fmt::Display for DirectionValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for DirectionValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -10715,7 +10736,7 @@ pub enum DotbinTransformAs {
 }
 impl ::std::default::Default for DotbinTransformAs {
     fn default() -> Self {
-        DotbinTransformAs::String("bin".to_string())
+        Self::String("bin".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for DotbinTransformAs {
@@ -10920,9 +10941,12 @@ impl ::std::ops::Deref for Encode {
         &self.0
     }
 }
-impl ::std::convert::From<Encode> for ::std::collections::HashMap<EncodeKey, EncodeEntry> {
+impl<__TypifyBuildHasher: ::std::hash::BuildHasher + ::std::default::Default>
+    ::std::convert::From<Encode>
+    for ::std::collections::HashMap<EncodeKey, EncodeEntry, __TypifyBuildHasher>
+{
     fn from(value: Encode) -> Self {
-        value.0
+        value.0.into_iter().collect()
     }
 }
 impl ::std::convert::From<::std::collections::HashMap<EncodeKey, EncodeEntry>> for Encode {
@@ -11704,7 +11728,7 @@ pub enum FoldTransformAs {
 }
 impl ::std::default::Default for FoldTransformAs {
     fn default() -> Self {
-        FoldTransformAs::Array([
+        Self::Array([
             FoldTransformAsArrayItem::String("key".to_string()),
             FoldTransformAsArrayItem::String("value".to_string()),
         ])
@@ -11915,9 +11939,9 @@ impl ::std::fmt::Display for FontWeightValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for FontWeightValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -12047,9 +12071,9 @@ impl ::std::fmt::Display for FontWeightValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for FontWeightValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -12157,7 +12181,7 @@ pub enum ForceTransformAlpha {
 }
 impl ::std::default::Default for ForceTransformAlpha {
     fn default() -> Self {
-        ForceTransformAlpha::Number(1_f64)
+        Self::Number(1_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformAlpha {
@@ -12179,7 +12203,7 @@ pub enum ForceTransformAlphaMin {
 }
 impl ::std::default::Default for ForceTransformAlphaMin {
     fn default() -> Self {
-        ForceTransformAlphaMin::Number(0.001_f64)
+        Self::Number(0.001_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformAlphaMin {
@@ -12218,7 +12242,7 @@ pub enum ForceTransformAs {
 }
 impl ::std::default::Default for ForceTransformAs {
     fn default() -> Self {
-        ForceTransformAs::Array(vec![
+        Self::Array(vec![
             ForceTransformAsArrayItem::String("x".to_string()),
             ForceTransformAsArrayItem::String("y".to_string()),
             ForceTransformAsArrayItem::String("vx".to_string()),
@@ -12324,7 +12348,7 @@ pub enum ForceTransformForcesItemDistance {
 }
 impl ::std::default::Default for ForceTransformForcesItemDistance {
     fn default() -> Self {
-        ForceTransformForcesItemDistance::Number(30_f64)
+        Self::Number(30_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformForcesItemDistance {
@@ -12373,7 +12397,7 @@ pub enum ForceTransformForcesItemDistanceMin {
 }
 impl ::std::default::Default for ForceTransformForcesItemDistanceMin {
     fn default() -> Self {
-        ForceTransformForcesItemDistanceMin::Number(1_f64)
+        Self::Number(1_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformForcesItemDistanceMin {
@@ -12418,7 +12442,7 @@ pub enum ForceTransformForcesItemIterations {
 }
 impl ::std::default::Default for ForceTransformForcesItemIterations {
     fn default() -> Self {
-        ForceTransformForcesItemIterations::Number(1_f64)
+        Self::Number(1_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformForcesItemIterations {
@@ -12469,7 +12493,7 @@ pub enum ForceTransformForcesItemStrength {
 }
 impl ::std::default::Default for ForceTransformForcesItemStrength {
     fn default() -> Self {
-        ForceTransformForcesItemStrength::Number(0.7_f64)
+        Self::Number(0.7_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformForcesItemStrength {
@@ -12491,7 +12515,7 @@ pub enum ForceTransformForcesItemStrength2 {
 }
 impl ::std::default::Default for ForceTransformForcesItemStrength2 {
     fn default() -> Self {
-        ForceTransformForcesItemStrength2::Number(-30_f64)
+        Self::Number(-30_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformForcesItemStrength2 {
@@ -12542,7 +12566,7 @@ pub enum ForceTransformForcesItemStrength4 {
 }
 impl ::std::default::Default for ForceTransformForcesItemStrength4 {
     fn default() -> Self {
-        ForceTransformForcesItemStrength4::Number(0.1_f64)
+        Self::Number(0.1_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformForcesItemStrength4 {
@@ -12564,7 +12588,7 @@ pub enum ForceTransformForcesItemStrength5 {
 }
 impl ::std::default::Default for ForceTransformForcesItemStrength5 {
     fn default() -> Self {
-        ForceTransformForcesItemStrength5::Number(0.1_f64)
+        Self::Number(0.1_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformForcesItemStrength5 {
@@ -12586,7 +12610,7 @@ pub enum ForceTransformForcesItemTheta {
 }
 impl ::std::default::Default for ForceTransformForcesItemTheta {
     fn default() -> Self {
-        ForceTransformForcesItemTheta::Number(0.9_f64)
+        Self::Number(0.9_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformForcesItemTheta {
@@ -12688,7 +12712,7 @@ pub enum ForceTransformIterations {
 }
 impl ::std::default::Default for ForceTransformIterations {
     fn default() -> Self {
-        ForceTransformIterations::Number(300_f64)
+        Self::Number(300_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformIterations {
@@ -12791,7 +12815,7 @@ pub enum ForceTransformVelocityDecay {
 }
 impl ::std::default::Default for ForceTransformVelocityDecay {
     fn default() -> Self {
-        ForceTransformVelocityDecay::Number(0.4_f64)
+        Self::Number(0.4_f64)
     }
 }
 impl ::std::convert::From<f64> for ForceTransformVelocityDecay {
@@ -13053,7 +13077,7 @@ pub enum GeopathTransformAs {
 }
 impl ::std::default::Default for GeopathTransformAs {
     fn default() -> Self {
-        GeopathTransformAs::String("path".to_string())
+        Self::String("path".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for GeopathTransformAs {
@@ -13182,7 +13206,7 @@ pub enum GeopointTransformAs {
 }
 impl ::std::default::Default for GeopointTransformAs {
     fn default() -> Self {
-        GeopointTransformAs::Array([
+        Self::Array([
             GeopointTransformAsArrayItem::String("x".to_string()),
             GeopointTransformAsArrayItem::String("y".to_string()),
         ])
@@ -13326,7 +13350,7 @@ pub enum GeoshapeTransformAs {
 }
 impl ::std::default::Default for GeoshapeTransformAs {
     fn default() -> Self {
-        GeoshapeTransformAs::String("shape".to_string())
+        Self::String("shape".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for GeoshapeTransformAs {
@@ -13344,7 +13368,7 @@ pub enum GeoshapeTransformField {
 }
 impl ::std::default::Default for GeoshapeTransformField {
     fn default() -> Self {
-        GeoshapeTransformField::ScaleField(ScaleField(StringOrSignal::String("datum".to_string())))
+        Self::ScaleField(ScaleField(StringOrSignal::String("datum".to_string())))
     }
 }
 impl ::std::convert::From<ScaleField> for GeoshapeTransformField {
@@ -13560,7 +13584,7 @@ pub enum GraticuleTransformPrecision {
 }
 impl ::std::default::Default for GraticuleTransformPrecision {
     fn default() -> Self {
-        GraticuleTransformPrecision::Number(2.5_f64)
+        Self::Number(2.5_f64)
     }
 }
 impl ::std::convert::From<f64> for GraticuleTransformPrecision {
@@ -13616,7 +13640,7 @@ pub enum GraticuleTransformStepMajor {
 }
 impl ::std::default::Default for GraticuleTransformStepMajor {
     fn default() -> Self {
-        GraticuleTransformStepMajor::Array([
+        Self::Array([
             GraticuleTransformStepMajorArrayItem::Number(90_f64),
             GraticuleTransformStepMajorArrayItem::Number(360_f64),
         ])
@@ -13660,7 +13684,7 @@ pub enum GraticuleTransformStepMinor {
 }
 impl ::std::default::Default for GraticuleTransformStepMinor {
     fn default() -> Self {
-        GraticuleTransformStepMinor::Array([
+        Self::Array([
             GraticuleTransformStepMinorArrayItem::Number(10_f64),
             GraticuleTransformStepMinorArrayItem::Number(10_f64),
         ])
@@ -13781,7 +13805,7 @@ pub enum HeatmapTransformAs {
 }
 impl ::std::default::Default for HeatmapTransformAs {
     fn default() -> Self {
-        HeatmapTransformAs::String("image".to_string())
+        Self::String("image".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for HeatmapTransformAs {
@@ -13874,7 +13898,7 @@ pub enum HeatmapTransformResolve {
 }
 impl ::std::default::Default for HeatmapTransformResolve {
     fn default() -> Self {
-        HeatmapTransformResolve::Variant0(HeatmapTransformResolveVariant0::Independent)
+        Self::Variant0(HeatmapTransformResolveVariant0::Independent)
     }
 }
 impl ::std::convert::From<HeatmapTransformResolveVariant0> for HeatmapTransformResolve {
@@ -14188,7 +14212,7 @@ pub enum ImputeTransformMethod {
 }
 impl ::std::default::Default for ImputeTransformMethod {
     fn default() -> Self {
-        ImputeTransformMethod::Variant0(ImputeTransformMethodVariant0::Value)
+        Self::Variant0(ImputeTransformMethodVariant0::Value)
     }
 }
 impl ::std::convert::From<ImputeTransformMethodVariant0> for ImputeTransformMethod {
@@ -14350,7 +14374,7 @@ pub enum IsocontourTransformAs {
 }
 impl ::std::default::Default for IsocontourTransformAs {
     fn default() -> Self {
-        IsocontourTransformAs::String("contour".to_string())
+        Self::String("contour".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for IsocontourTransformAs {
@@ -14424,7 +14448,7 @@ pub enum IsocontourTransformResolve {
 }
 impl ::std::default::Default for IsocontourTransformResolve {
     fn default() -> Self {
-        IsocontourTransformResolve::Variant0(IsocontourTransformResolveVariant0::Independent)
+        Self::Variant0(IsocontourTransformResolveVariant0::Independent)
     }
 }
 impl ::std::convert::From<IsocontourTransformResolveVariant0> for IsocontourTransformResolve {
@@ -14526,7 +14550,7 @@ pub enum IsocontourTransformSmooth {
 }
 impl ::std::default::Default for IsocontourTransformSmooth {
     fn default() -> Self {
-        IsocontourTransformSmooth::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for IsocontourTransformSmooth {
@@ -14679,7 +14703,7 @@ pub enum IsocontourTransformZero {
 }
 impl ::std::default::Default for IsocontourTransformZero {
     fn default() -> Self {
-        IsocontourTransformZero::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for IsocontourTransformZero {
@@ -15111,7 +15135,7 @@ pub enum Kde2dTransformAs {
 }
 impl ::std::default::Default for Kde2dTransformAs {
     fn default() -> Self {
-        Kde2dTransformAs::String("grid".to_string())
+        Self::String("grid".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for Kde2dTransformAs {
@@ -15418,7 +15442,7 @@ pub enum KdeTransformAs {
 }
 impl ::std::default::Default for KdeTransformAs {
     fn default() -> Self {
-        KdeTransformAs::Array(vec![
+        Self::Array(vec![
             KdeTransformAsArrayItem::String("value".to_string()),
             KdeTransformAsArrayItem::String("density".to_string()),
         ])
@@ -15603,7 +15627,7 @@ pub enum KdeTransformMaxsteps {
 }
 impl ::std::default::Default for KdeTransformMaxsteps {
     fn default() -> Self {
-        KdeTransformMaxsteps::Number(200_f64)
+        Self::Number(200_f64)
     }
 }
 impl ::std::convert::From<f64> for KdeTransformMaxsteps {
@@ -15625,7 +15649,7 @@ pub enum KdeTransformMinsteps {
 }
 impl ::std::default::Default for KdeTransformMinsteps {
     fn default() -> Self {
-        KdeTransformMinsteps::Number(25_f64)
+        Self::Number(25_f64)
     }
 }
 impl ::std::convert::From<f64> for KdeTransformMinsteps {
@@ -15647,7 +15671,7 @@ pub enum KdeTransformResolve {
 }
 impl ::std::default::Default for KdeTransformResolve {
     fn default() -> Self {
-        KdeTransformResolve::Variant0(KdeTransformResolveVariant0::Independent)
+        Self::Variant0(KdeTransformResolveVariant0::Independent)
     }
 }
 impl ::std::convert::From<KdeTransformResolveVariant0> for KdeTransformResolve {
@@ -15900,7 +15924,7 @@ pub enum LabelTransformAnchor {
 }
 impl ::std::default::Default for LabelTransformAnchor {
     fn default() -> Self {
-        LabelTransformAnchor::Array(vec![
+        Self::Array(vec![
             LabelTransformAnchorArrayItem::String("top-left".to_string()),
             LabelTransformAnchorArrayItem::String("left".to_string()),
             LabelTransformAnchorArrayItem::String("bottom-left".to_string()),
@@ -15943,7 +15967,7 @@ pub enum LabelTransformAs {
 }
 impl ::std::default::Default for LabelTransformAs {
     fn default() -> Self {
-        LabelTransformAs::Array([
+        Self::Array([
             LabelTransformAsArrayItem::String("x".to_string()),
             LabelTransformAsArrayItem::String("y".to_string()),
             LabelTransformAsArrayItem::String("opacity".to_string()),
@@ -15983,7 +16007,7 @@ pub enum LabelTransformAvoidBaseMark {
 }
 impl ::std::default::Default for LabelTransformAvoidBaseMark {
     fn default() -> Self {
-        LabelTransformAvoidBaseMark::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for LabelTransformAvoidBaseMark {
@@ -16022,7 +16046,7 @@ pub enum LabelTransformLineAnchor {
 }
 impl ::std::default::Default for LabelTransformLineAnchor {
     fn default() -> Self {
-        LabelTransformLineAnchor::String("end".to_string())
+        Self::String("end".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for LabelTransformLineAnchor {
@@ -16056,7 +16080,7 @@ pub enum LabelTransformMethod {
 }
 impl ::std::default::Default for LabelTransformMethod {
     fn default() -> Self {
-        LabelTransformMethod::String("naive".to_string())
+        Self::String("naive".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for LabelTransformMethod {
@@ -16073,7 +16097,7 @@ pub enum LabelTransformOffset {
 }
 impl ::std::default::Default for LabelTransformOffset {
     fn default() -> Self {
-        LabelTransformOffset::Array(vec![LabelTransformOffsetArrayItem::Number(1_f64)])
+        Self::Array(vec![LabelTransformOffsetArrayItem::Number(1_f64)])
     }
 }
 impl ::std::convert::From<::std::vec::Vec<LabelTransformOffsetArrayItem>> for LabelTransformOffset {
@@ -28975,7 +28999,7 @@ pub enum LinkpathTransformAs {
 }
 impl ::std::default::Default for LinkpathTransformAs {
     fn default() -> Self {
-        LinkpathTransformAs::String("path".to_string())
+        Self::String("path".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for LinkpathTransformAs {
@@ -28992,7 +29016,7 @@ pub enum LinkpathTransformOrient {
 }
 impl ::std::default::Default for LinkpathTransformOrient {
     fn default() -> Self {
-        LinkpathTransformOrient::Variant0(LinkpathTransformOrientVariant0::Vertical)
+        Self::Variant0(LinkpathTransformOrientVariant0::Vertical)
     }
 }
 impl ::std::convert::From<LinkpathTransformOrientVariant0> for LinkpathTransformOrient {
@@ -29069,7 +29093,7 @@ pub enum LinkpathTransformShape {
 }
 impl ::std::default::Default for LinkpathTransformShape {
     fn default() -> Self {
-        LinkpathTransformShape::Variant0(LinkpathTransformShapeVariant0::Line)
+        Self::Variant0(LinkpathTransformShapeVariant0::Line)
     }
 }
 impl ::std::convert::From<LinkpathTransformShapeVariant0> for LinkpathTransformShape {
@@ -29155,9 +29179,7 @@ pub enum LinkpathTransformSourceX {
 }
 impl ::std::default::Default for LinkpathTransformSourceX {
     fn default() -> Self {
-        LinkpathTransformSourceX::ScaleField(ScaleField(StringOrSignal::String(
-            "source.x".to_string(),
-        )))
+        Self::ScaleField(ScaleField(StringOrSignal::String("source.x".to_string())))
     }
 }
 impl ::std::convert::From<ScaleField> for LinkpathTransformSourceX {
@@ -29185,9 +29207,7 @@ pub enum LinkpathTransformSourceY {
 }
 impl ::std::default::Default for LinkpathTransformSourceY {
     fn default() -> Self {
-        LinkpathTransformSourceY::ScaleField(ScaleField(StringOrSignal::String(
-            "source.y".to_string(),
-        )))
+        Self::ScaleField(ScaleField(StringOrSignal::String("source.y".to_string())))
     }
 }
 impl ::std::convert::From<ScaleField> for LinkpathTransformSourceY {
@@ -29215,9 +29235,7 @@ pub enum LinkpathTransformTargetX {
 }
 impl ::std::default::Default for LinkpathTransformTargetX {
     fn default() -> Self {
-        LinkpathTransformTargetX::ScaleField(ScaleField(StringOrSignal::String(
-            "target.x".to_string(),
-        )))
+        Self::ScaleField(ScaleField(StringOrSignal::String("target.x".to_string())))
     }
 }
 impl ::std::convert::From<ScaleField> for LinkpathTransformTargetX {
@@ -29245,9 +29263,7 @@ pub enum LinkpathTransformTargetY {
 }
 impl ::std::default::Default for LinkpathTransformTargetY {
     fn default() -> Self {
-        LinkpathTransformTargetY::ScaleField(ScaleField(StringOrSignal::String(
-            "target.y".to_string(),
-        )))
+        Self::ScaleField(ScaleField(StringOrSignal::String("target.y".to_string())))
     }
 }
 impl ::std::convert::From<ScaleField> for LinkpathTransformTargetY {
@@ -29385,7 +29401,7 @@ pub enum LoessTransformBandwidth {
 }
 impl ::std::default::Default for LoessTransformBandwidth {
     fn default() -> Self {
-        LoessTransformBandwidth::Number(0.3_f64)
+        Self::Number(0.3_f64)
     }
 }
 impl ::std::convert::From<f64> for LoessTransformBandwidth {
@@ -30136,9 +30152,9 @@ impl ::std::fmt::Display for NumberModifiersBand {
 impl ::std::str::FromStr for NumberModifiersBand {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -30389,9 +30405,9 @@ impl ::std::fmt::Display for NumberValueVariant0ItemVariant0Variant0Band {
 impl ::std::str::FromStr for NumberValueVariant0ItemVariant0Variant0Band {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -30493,9 +30509,9 @@ impl ::std::fmt::Display for NumberValueVariant0ItemVariant0Variant1Band {
 impl ::std::str::FromStr for NumberValueVariant0ItemVariant0Variant1Band {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -30597,9 +30613,9 @@ impl ::std::fmt::Display for NumberValueVariant0ItemVariant0Variant2Band {
 impl ::std::str::FromStr for NumberValueVariant0ItemVariant0Variant2Band {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -30701,9 +30717,9 @@ impl ::std::fmt::Display for NumberValueVariant0ItemVariant0Variant3Band {
 impl ::std::str::FromStr for NumberValueVariant0ItemVariant0Variant3Band {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -30805,9 +30821,9 @@ impl ::std::fmt::Display for NumberValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for NumberValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -31046,9 +31062,9 @@ impl ::std::fmt::Display for NumberValueVariant1Variant0Variant0Band {
 impl ::std::str::FromStr for NumberValueVariant1Variant0Variant0Band {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -31154,9 +31170,9 @@ impl ::std::fmt::Display for NumberValueVariant1Variant0Variant1Band {
 impl ::std::str::FromStr for NumberValueVariant1Variant0Variant1Band {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -31262,9 +31278,9 @@ impl ::std::fmt::Display for NumberValueVariant1Variant0Variant2Band {
 impl ::std::str::FromStr for NumberValueVariant1Variant0Variant2Band {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -31370,9 +31386,9 @@ impl ::std::fmt::Display for NumberValueVariant1Variant0Variant3Band {
 impl ::std::str::FromStr for NumberValueVariant1Variant0Variant3Band {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -31478,9 +31494,9 @@ impl ::std::fmt::Display for NumberValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for NumberValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -31947,9 +31963,9 @@ impl ::std::fmt::Display for OrientValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for OrientValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -32138,9 +32154,9 @@ impl ::std::fmt::Display for OrientValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for OrientValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -32231,7 +32247,7 @@ pub enum PackTransformAs {
 }
 impl ::std::default::Default for PackTransformAs {
     fn default() -> Self {
-        PackTransformAs::Array([
+        Self::Array([
             PackTransformAsArrayItem::String("x".to_string()),
             PackTransformAsArrayItem::String("y".to_string()),
             PackTransformAsArrayItem::String("r".to_string()),
@@ -32471,7 +32487,7 @@ pub enum PartitionTransformAs {
 }
 impl ::std::default::Default for PartitionTransformAs {
     fn default() -> Self {
-        PartitionTransformAs::Array([
+        Self::Array([
             PartitionTransformAsArrayItem::String("x0".to_string()),
             PartitionTransformAsArrayItem::String("y0".to_string()),
             PartitionTransformAsArrayItem::String("x1".to_string()),
@@ -32672,7 +32688,7 @@ pub enum PieTransformAs {
 }
 impl ::std::default::Default for PieTransformAs {
     fn default() -> Self {
-        PieTransformAs::Array([
+        Self::Array([
             PieTransformAsArrayItem::String("startAngle".to_string()),
             PieTransformAsArrayItem::String("endAngle".to_string()),
         ])
@@ -32709,7 +32725,7 @@ pub enum PieTransformEndAngle {
 }
 impl ::std::default::Default for PieTransformEndAngle {
     fn default() -> Self {
-        PieTransformEndAngle::Number(6.283185307179586_f64)
+        Self::Number(6.283185307179586_f64)
     }
 }
 impl ::std::convert::From<f64> for PieTransformEndAngle {
@@ -32959,7 +32975,7 @@ pub enum PivotTransformOp {
 }
 impl ::std::default::Default for PivotTransformOp {
     fn default() -> Self {
-        PivotTransformOp::Variant0(PivotTransformOpVariant0::Sum)
+        Self::Variant0(PivotTransformOpVariant0::Sum)
     }
 }
 impl ::std::convert::From<PivotTransformOpVariant0> for PivotTransformOp {
@@ -33555,7 +33571,7 @@ pub enum QuantileTransformAs {
 }
 impl ::std::default::Default for QuantileTransformAs {
     fn default() -> Self {
-        QuantileTransformAs::Array(vec![
+        Self::Array(vec![
             QuantileTransformAsArrayItem::String("prob".to_string()),
             QuantileTransformAsArrayItem::String("value".to_string()),
         ])
@@ -33693,7 +33709,7 @@ pub enum QuantileTransformStep {
 }
 impl ::std::default::Default for QuantileTransformStep {
     fn default() -> Self {
-        QuantileTransformStep::Number(0.01_f64)
+        Self::Number(0.01_f64)
     }
 }
 impl ::std::convert::From<f64> for QuantileTransformStep {
@@ -33962,7 +33978,7 @@ pub enum RegressionTransformMethod {
 }
 impl ::std::default::Default for RegressionTransformMethod {
     fn default() -> Self {
-        RegressionTransformMethod::String("linear".to_string())
+        Self::String("linear".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for RegressionTransformMethod {
@@ -33979,7 +33995,7 @@ pub enum RegressionTransformOrder {
 }
 impl ::std::default::Default for RegressionTransformOrder {
     fn default() -> Self {
-        RegressionTransformOrder::Number(3_f64)
+        Self::Number(3_f64)
     }
 }
 impl ::std::convert::From<f64> for RegressionTransformOrder {
@@ -34203,7 +34219,7 @@ pub enum SampleTransformSize {
 }
 impl ::std::default::Default for SampleTransformSize {
     fn default() -> Self {
-        SampleTransformSize::Number(1000_f64)
+        Self::Number(1000_f64)
     }
 }
 impl ::std::convert::From<f64> for SampleTransformSize {
@@ -39318,7 +39334,7 @@ pub enum SequenceTransformAs {
 }
 impl ::std::default::Default for SequenceTransformAs {
     fn default() -> Self {
-        SequenceTransformAs::String("data".to_string())
+        Self::String("data".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for SequenceTransformAs {
@@ -39352,7 +39368,7 @@ pub enum SequenceTransformStep {
 }
 impl ::std::default::Default for SequenceTransformStep {
     fn default() -> Self {
-        SequenceTransformStep::Number(1_f64)
+        Self::Number(1_f64)
     }
 }
 impl ::std::convert::From<f64> for SequenceTransformStep {
@@ -39660,7 +39676,7 @@ pub enum StackTransformAs {
 }
 impl ::std::default::Default for StackTransformAs {
     fn default() -> Self {
-        StackTransformAs::Array([
+        Self::Array([
             StackTransformAsArrayItem::String("y0".to_string()),
             StackTransformAsArrayItem::String("y1".to_string()),
         ])
@@ -39762,7 +39778,7 @@ pub enum StackTransformOffset {
 }
 impl ::std::default::Default for StackTransformOffset {
     fn default() -> Self {
-        StackTransformOffset::Variant0(StackTransformOffsetVariant0::Zero)
+        Self::Variant0(StackTransformOffsetVariant0::Zero)
     }
 }
 impl ::std::convert::From<StackTransformOffsetVariant0> for StackTransformOffset {
@@ -40206,9 +40222,9 @@ impl ::std::fmt::Display for StringValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for StringValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -40338,9 +40354,9 @@ impl ::std::fmt::Display for StringValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for StringValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -40554,9 +40570,9 @@ impl ::std::fmt::Display for StrokeCapValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for StrokeCapValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -40743,9 +40759,9 @@ impl ::std::fmt::Display for StrokeCapValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for StrokeCapValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -40961,9 +40977,9 @@ impl ::std::fmt::Display for StrokeJoinValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for StrokeJoinValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -41150,9 +41166,9 @@ impl ::std::fmt::Display for StrokeJoinValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for StrokeJoinValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -41366,9 +41382,9 @@ impl ::std::fmt::Display for TextValueVariant0ItemVariant0Variant3Range {
 impl ::std::str::FromStr for TextValueVariant0ItemVariant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -41510,9 +41526,9 @@ impl ::std::fmt::Display for TextValueVariant1Variant0Variant3Range {
 impl ::std::str::FromStr for TextValueVariant1Variant0Variant3Range {
     type Err = self::error::ConversionError;
     fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
-        if let Ok(v) = value.parse() {
+        if let Ok(v) = value.parse::<f64>() {
             Ok(Self::Number(v))
-        } else if let Ok(v) = value.parse() {
+        } else if let Ok(v) = value.parse::<bool>() {
             Ok(Self::Boolean(v))
         } else {
             Err("string conversion failed for all variants".into())
@@ -41869,7 +41885,7 @@ pub enum TimeunitTransformAs {
 }
 impl ::std::default::Default for TimeunitTransformAs {
     fn default() -> Self {
-        TimeunitTransformAs::Array([
+        Self::Array([
             TimeunitTransformAsArrayItem::String("unit0".to_string()),
             TimeunitTransformAsArrayItem::String("unit1".to_string()),
         ])
@@ -41965,7 +41981,7 @@ pub enum TimeunitTransformInterval {
 }
 impl ::std::default::Default for TimeunitTransformInterval {
     fn default() -> Self {
-        TimeunitTransformInterval::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for TimeunitTransformInterval {
@@ -41987,7 +42003,7 @@ pub enum TimeunitTransformMaxbins {
 }
 impl ::std::default::Default for TimeunitTransformMaxbins {
     fn default() -> Self {
-        TimeunitTransformMaxbins::Number(40_f64)
+        Self::Number(40_f64)
     }
 }
 impl ::std::convert::From<f64> for TimeunitTransformMaxbins {
@@ -42009,7 +42025,7 @@ pub enum TimeunitTransformStep {
 }
 impl ::std::default::Default for TimeunitTransformStep {
     fn default() -> Self {
-        TimeunitTransformStep::Number(1_f64)
+        Self::Number(1_f64)
     }
 }
 impl ::std::convert::From<f64> for TimeunitTransformStep {
@@ -42031,7 +42047,7 @@ pub enum TimeunitTransformTimezone {
 }
 impl ::std::default::Default for TimeunitTransformTimezone {
     fn default() -> Self {
-        TimeunitTransformTimezone::Variant0(TimeunitTransformTimezoneVariant0::Local)
+        Self::Variant0(TimeunitTransformTimezoneVariant0::Local)
     }
 }
 impl ::std::convert::From<TimeunitTransformTimezoneVariant0> for TimeunitTransformTimezone {
@@ -43086,496 +43102,577 @@ impl ::std::convert::From<NumberValue> for TitleObjectSubtitleLineHeight {
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(untagged)]
 pub enum Transform {
-    CrossfilterTransform(CrossfilterTransform),
-    ResolvefilterTransform(ResolvefilterTransform),
-    LinkpathTransform(LinkpathTransform),
-    PieTransform(PieTransform),
-    StackTransform(StackTransform),
-    ForceTransform(ForceTransform),
-    ContourTransform(ContourTransform),
-    GeojsonTransform(GeojsonTransform),
-    GeopathTransform(GeopathTransform),
-    GeopointTransform(GeopointTransform),
-    GeoshapeTransform(GeoshapeTransform),
-    GraticuleTransform(GraticuleTransform),
-    HeatmapTransform(HeatmapTransform),
-    IsocontourTransform(IsocontourTransform),
-    Kde2dTransform(Kde2dTransform),
-    NestTransform(NestTransform),
-    PackTransform(PackTransform),
-    PartitionTransform(PartitionTransform),
-    StratifyTransform(StratifyTransform),
-    TreeTransform(TreeTransform),
-    TreelinksTransform(TreelinksTransform),
-    TreemapTransform(TreemapTransform),
-    LabelTransform(LabelTransform),
-    LoessTransform(LoessTransform),
-    RegressionTransform(RegressionTransform),
-    AggregateTransform(AggregateTransform),
-    BinTransform(BinTransform),
-    CollectTransform(CollectTransform),
-    CountpatternTransform(CountpatternTransform),
-    CrossTransform(CrossTransform),
-    DensityTransform(DensityTransform),
-    DotbinTransform(DotbinTransform),
-    ExtentTransform(ExtentTransform),
-    FilterTransform(FilterTransform),
-    FlattenTransform(FlattenTransform),
-    FoldTransform(FoldTransform),
-    FormulaTransform(FormulaTransform),
-    ImputeTransform(ImputeTransform),
-    JoinaggregateTransform(JoinaggregateTransform),
-    KdeTransform(KdeTransform),
-    LookupTransform(LookupTransform),
-    PivotTransform(PivotTransform),
-    ProjectTransform(ProjectTransform),
-    QuantileTransform(QuantileTransform),
-    SampleTransform(SampleTransform),
-    SequenceTransform(SequenceTransform),
-    TimeunitTransform(TimeunitTransform),
-    WindowTransform(WindowTransform),
-    IdentifierTransform(IdentifierTransform),
-    VoronoiTransform(VoronoiTransform),
-    WordcloudTransform(WordcloudTransform),
+    #[serde(rename = "CrossfilterTransform")]
+    Crossfilter(CrossfilterTransform),
+    #[serde(rename = "ResolvefilterTransform")]
+    Resolvefilter(ResolvefilterTransform),
+    #[serde(rename = "LinkpathTransform")]
+    Linkpath(LinkpathTransform),
+    #[serde(rename = "PieTransform")]
+    Pie(PieTransform),
+    #[serde(rename = "StackTransform")]
+    Stack(StackTransform),
+    #[serde(rename = "ForceTransform")]
+    Force(ForceTransform),
+    #[serde(rename = "ContourTransform")]
+    Contour(ContourTransform),
+    #[serde(rename = "GeojsonTransform")]
+    Geojson(GeojsonTransform),
+    #[serde(rename = "GeopathTransform")]
+    Geopath(GeopathTransform),
+    #[serde(rename = "GeopointTransform")]
+    Geopoint(GeopointTransform),
+    #[serde(rename = "GeoshapeTransform")]
+    Geoshape(GeoshapeTransform),
+    #[serde(rename = "GraticuleTransform")]
+    Graticule(GraticuleTransform),
+    #[serde(rename = "HeatmapTransform")]
+    Heatmap(HeatmapTransform),
+    #[serde(rename = "IsocontourTransform")]
+    Isocontour(IsocontourTransform),
+    #[serde(rename = "Kde2dTransform")]
+    Kde2d(Kde2dTransform),
+    #[serde(rename = "NestTransform")]
+    Nest(NestTransform),
+    #[serde(rename = "PackTransform")]
+    Pack(PackTransform),
+    #[serde(rename = "PartitionTransform")]
+    Partition(PartitionTransform),
+    #[serde(rename = "StratifyTransform")]
+    Stratify(StratifyTransform),
+    #[serde(rename = "TreeTransform")]
+    Tree(TreeTransform),
+    #[serde(rename = "TreelinksTransform")]
+    Treelinks(TreelinksTransform),
+    #[serde(rename = "TreemapTransform")]
+    Treemap(TreemapTransform),
+    #[serde(rename = "LabelTransform")]
+    Label(LabelTransform),
+    #[serde(rename = "LoessTransform")]
+    Loess(LoessTransform),
+    #[serde(rename = "RegressionTransform")]
+    Regression(RegressionTransform),
+    #[serde(rename = "AggregateTransform")]
+    Aggregate(AggregateTransform),
+    #[serde(rename = "BinTransform")]
+    Bin(BinTransform),
+    #[serde(rename = "CollectTransform")]
+    Collect(CollectTransform),
+    #[serde(rename = "CountpatternTransform")]
+    Countpattern(CountpatternTransform),
+    #[serde(rename = "CrossTransform")]
+    Cross(CrossTransform),
+    #[serde(rename = "DensityTransform")]
+    Density(DensityTransform),
+    #[serde(rename = "DotbinTransform")]
+    Dotbin(DotbinTransform),
+    #[serde(rename = "ExtentTransform")]
+    Extent(ExtentTransform),
+    #[serde(rename = "FilterTransform")]
+    Filter(FilterTransform),
+    #[serde(rename = "FlattenTransform")]
+    Flatten(FlattenTransform),
+    #[serde(rename = "FoldTransform")]
+    Fold(FoldTransform),
+    #[serde(rename = "FormulaTransform")]
+    Formula(FormulaTransform),
+    #[serde(rename = "ImputeTransform")]
+    Impute(ImputeTransform),
+    #[serde(rename = "JoinaggregateTransform")]
+    Joinaggregate(JoinaggregateTransform),
+    #[serde(rename = "KdeTransform")]
+    Kde(KdeTransform),
+    #[serde(rename = "LookupTransform")]
+    Lookup(LookupTransform),
+    #[serde(rename = "PivotTransform")]
+    Pivot(PivotTransform),
+    #[serde(rename = "ProjectTransform")]
+    Project(ProjectTransform),
+    #[serde(rename = "QuantileTransform")]
+    Quantile(QuantileTransform),
+    #[serde(rename = "SampleTransform")]
+    Sample(SampleTransform),
+    #[serde(rename = "SequenceTransform")]
+    Sequence(SequenceTransform),
+    #[serde(rename = "TimeunitTransform")]
+    Timeunit(TimeunitTransform),
+    #[serde(rename = "WindowTransform")]
+    Window(WindowTransform),
+    #[serde(rename = "IdentifierTransform")]
+    Identifier(IdentifierTransform),
+    #[serde(rename = "VoronoiTransform")]
+    Voronoi(VoronoiTransform),
+    #[serde(rename = "WordcloudTransform")]
+    Wordcloud(WordcloudTransform),
 }
 impl ::std::convert::From<CrossfilterTransform> for Transform {
     fn from(value: CrossfilterTransform) -> Self {
-        Self::CrossfilterTransform(value)
+        Self::Crossfilter(value)
     }
 }
 impl ::std::convert::From<ResolvefilterTransform> for Transform {
     fn from(value: ResolvefilterTransform) -> Self {
-        Self::ResolvefilterTransform(value)
+        Self::Resolvefilter(value)
     }
 }
 impl ::std::convert::From<LinkpathTransform> for Transform {
     fn from(value: LinkpathTransform) -> Self {
-        Self::LinkpathTransform(value)
+        Self::Linkpath(value)
     }
 }
 impl ::std::convert::From<PieTransform> for Transform {
     fn from(value: PieTransform) -> Self {
-        Self::PieTransform(value)
+        Self::Pie(value)
     }
 }
 impl ::std::convert::From<StackTransform> for Transform {
     fn from(value: StackTransform) -> Self {
-        Self::StackTransform(value)
+        Self::Stack(value)
     }
 }
 impl ::std::convert::From<ForceTransform> for Transform {
     fn from(value: ForceTransform) -> Self {
-        Self::ForceTransform(value)
+        Self::Force(value)
     }
 }
 impl ::std::convert::From<ContourTransform> for Transform {
     fn from(value: ContourTransform) -> Self {
-        Self::ContourTransform(value)
+        Self::Contour(value)
     }
 }
 impl ::std::convert::From<GeojsonTransform> for Transform {
     fn from(value: GeojsonTransform) -> Self {
-        Self::GeojsonTransform(value)
+        Self::Geojson(value)
     }
 }
 impl ::std::convert::From<GeopathTransform> for Transform {
     fn from(value: GeopathTransform) -> Self {
-        Self::GeopathTransform(value)
+        Self::Geopath(value)
     }
 }
 impl ::std::convert::From<GeopointTransform> for Transform {
     fn from(value: GeopointTransform) -> Self {
-        Self::GeopointTransform(value)
+        Self::Geopoint(value)
     }
 }
 impl ::std::convert::From<GeoshapeTransform> for Transform {
     fn from(value: GeoshapeTransform) -> Self {
-        Self::GeoshapeTransform(value)
+        Self::Geoshape(value)
     }
 }
 impl ::std::convert::From<GraticuleTransform> for Transform {
     fn from(value: GraticuleTransform) -> Self {
-        Self::GraticuleTransform(value)
+        Self::Graticule(value)
     }
 }
 impl ::std::convert::From<HeatmapTransform> for Transform {
     fn from(value: HeatmapTransform) -> Self {
-        Self::HeatmapTransform(value)
+        Self::Heatmap(value)
     }
 }
 impl ::std::convert::From<IsocontourTransform> for Transform {
     fn from(value: IsocontourTransform) -> Self {
-        Self::IsocontourTransform(value)
+        Self::Isocontour(value)
     }
 }
 impl ::std::convert::From<Kde2dTransform> for Transform {
     fn from(value: Kde2dTransform) -> Self {
-        Self::Kde2dTransform(value)
+        Self::Kde2d(value)
     }
 }
 impl ::std::convert::From<NestTransform> for Transform {
     fn from(value: NestTransform) -> Self {
-        Self::NestTransform(value)
+        Self::Nest(value)
     }
 }
 impl ::std::convert::From<PackTransform> for Transform {
     fn from(value: PackTransform) -> Self {
-        Self::PackTransform(value)
+        Self::Pack(value)
     }
 }
 impl ::std::convert::From<PartitionTransform> for Transform {
     fn from(value: PartitionTransform) -> Self {
-        Self::PartitionTransform(value)
+        Self::Partition(value)
     }
 }
 impl ::std::convert::From<StratifyTransform> for Transform {
     fn from(value: StratifyTransform) -> Self {
-        Self::StratifyTransform(value)
+        Self::Stratify(value)
     }
 }
 impl ::std::convert::From<TreeTransform> for Transform {
     fn from(value: TreeTransform) -> Self {
-        Self::TreeTransform(value)
+        Self::Tree(value)
     }
 }
 impl ::std::convert::From<TreelinksTransform> for Transform {
     fn from(value: TreelinksTransform) -> Self {
-        Self::TreelinksTransform(value)
+        Self::Treelinks(value)
     }
 }
 impl ::std::convert::From<TreemapTransform> for Transform {
     fn from(value: TreemapTransform) -> Self {
-        Self::TreemapTransform(value)
+        Self::Treemap(value)
     }
 }
 impl ::std::convert::From<LabelTransform> for Transform {
     fn from(value: LabelTransform) -> Self {
-        Self::LabelTransform(value)
+        Self::Label(value)
     }
 }
 impl ::std::convert::From<LoessTransform> for Transform {
     fn from(value: LoessTransform) -> Self {
-        Self::LoessTransform(value)
+        Self::Loess(value)
     }
 }
 impl ::std::convert::From<RegressionTransform> for Transform {
     fn from(value: RegressionTransform) -> Self {
-        Self::RegressionTransform(value)
+        Self::Regression(value)
     }
 }
 impl ::std::convert::From<AggregateTransform> for Transform {
     fn from(value: AggregateTransform) -> Self {
-        Self::AggregateTransform(value)
+        Self::Aggregate(value)
     }
 }
 impl ::std::convert::From<BinTransform> for Transform {
     fn from(value: BinTransform) -> Self {
-        Self::BinTransform(value)
+        Self::Bin(value)
     }
 }
 impl ::std::convert::From<CollectTransform> for Transform {
     fn from(value: CollectTransform) -> Self {
-        Self::CollectTransform(value)
+        Self::Collect(value)
     }
 }
 impl ::std::convert::From<CountpatternTransform> for Transform {
     fn from(value: CountpatternTransform) -> Self {
-        Self::CountpatternTransform(value)
+        Self::Countpattern(value)
     }
 }
 impl ::std::convert::From<CrossTransform> for Transform {
     fn from(value: CrossTransform) -> Self {
-        Self::CrossTransform(value)
+        Self::Cross(value)
     }
 }
 impl ::std::convert::From<DensityTransform> for Transform {
     fn from(value: DensityTransform) -> Self {
-        Self::DensityTransform(value)
+        Self::Density(value)
     }
 }
 impl ::std::convert::From<DotbinTransform> for Transform {
     fn from(value: DotbinTransform) -> Self {
-        Self::DotbinTransform(value)
+        Self::Dotbin(value)
     }
 }
 impl ::std::convert::From<ExtentTransform> for Transform {
     fn from(value: ExtentTransform) -> Self {
-        Self::ExtentTransform(value)
+        Self::Extent(value)
     }
 }
 impl ::std::convert::From<FilterTransform> for Transform {
     fn from(value: FilterTransform) -> Self {
-        Self::FilterTransform(value)
+        Self::Filter(value)
     }
 }
 impl ::std::convert::From<FlattenTransform> for Transform {
     fn from(value: FlattenTransform) -> Self {
-        Self::FlattenTransform(value)
+        Self::Flatten(value)
     }
 }
 impl ::std::convert::From<FoldTransform> for Transform {
     fn from(value: FoldTransform) -> Self {
-        Self::FoldTransform(value)
+        Self::Fold(value)
     }
 }
 impl ::std::convert::From<FormulaTransform> for Transform {
     fn from(value: FormulaTransform) -> Self {
-        Self::FormulaTransform(value)
+        Self::Formula(value)
     }
 }
 impl ::std::convert::From<ImputeTransform> for Transform {
     fn from(value: ImputeTransform) -> Self {
-        Self::ImputeTransform(value)
+        Self::Impute(value)
     }
 }
 impl ::std::convert::From<JoinaggregateTransform> for Transform {
     fn from(value: JoinaggregateTransform) -> Self {
-        Self::JoinaggregateTransform(value)
+        Self::Joinaggregate(value)
     }
 }
 impl ::std::convert::From<KdeTransform> for Transform {
     fn from(value: KdeTransform) -> Self {
-        Self::KdeTransform(value)
+        Self::Kde(value)
     }
 }
 impl ::std::convert::From<LookupTransform> for Transform {
     fn from(value: LookupTransform) -> Self {
-        Self::LookupTransform(value)
+        Self::Lookup(value)
     }
 }
 impl ::std::convert::From<PivotTransform> for Transform {
     fn from(value: PivotTransform) -> Self {
-        Self::PivotTransform(value)
+        Self::Pivot(value)
     }
 }
 impl ::std::convert::From<ProjectTransform> for Transform {
     fn from(value: ProjectTransform) -> Self {
-        Self::ProjectTransform(value)
+        Self::Project(value)
     }
 }
 impl ::std::convert::From<QuantileTransform> for Transform {
     fn from(value: QuantileTransform) -> Self {
-        Self::QuantileTransform(value)
+        Self::Quantile(value)
     }
 }
 impl ::std::convert::From<SampleTransform> for Transform {
     fn from(value: SampleTransform) -> Self {
-        Self::SampleTransform(value)
+        Self::Sample(value)
     }
 }
 impl ::std::convert::From<SequenceTransform> for Transform {
     fn from(value: SequenceTransform) -> Self {
-        Self::SequenceTransform(value)
+        Self::Sequence(value)
     }
 }
 impl ::std::convert::From<TimeunitTransform> for Transform {
     fn from(value: TimeunitTransform) -> Self {
-        Self::TimeunitTransform(value)
+        Self::Timeunit(value)
     }
 }
 impl ::std::convert::From<WindowTransform> for Transform {
     fn from(value: WindowTransform) -> Self {
-        Self::WindowTransform(value)
+        Self::Window(value)
     }
 }
 impl ::std::convert::From<IdentifierTransform> for Transform {
     fn from(value: IdentifierTransform) -> Self {
-        Self::IdentifierTransform(value)
+        Self::Identifier(value)
     }
 }
 impl ::std::convert::From<VoronoiTransform> for Transform {
     fn from(value: VoronoiTransform) -> Self {
-        Self::VoronoiTransform(value)
+        Self::Voronoi(value)
     }
 }
 impl ::std::convert::From<WordcloudTransform> for Transform {
     fn from(value: WordcloudTransform) -> Self {
-        Self::WordcloudTransform(value)
+        Self::Wordcloud(value)
     }
 }
 #[doc = "`TransformMark`"]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug)]
 #[serde(untagged)]
 pub enum TransformMark {
-    CrossfilterTransform(CrossfilterTransform),
-    ResolvefilterTransform(ResolvefilterTransform),
-    LinkpathTransform(LinkpathTransform),
-    PieTransform(PieTransform),
-    StackTransform(StackTransform),
-    ForceTransform(ForceTransform),
-    GeojsonTransform(GeojsonTransform),
-    GeopathTransform(GeopathTransform),
-    GeopointTransform(GeopointTransform),
-    GeoshapeTransform(GeoshapeTransform),
-    HeatmapTransform(HeatmapTransform),
-    PackTransform(PackTransform),
-    PartitionTransform(PartitionTransform),
-    StratifyTransform(StratifyTransform),
-    TreeTransform(TreeTransform),
-    TreemapTransform(TreemapTransform),
-    LabelTransform(LabelTransform),
-    BinTransform(BinTransform),
-    CollectTransform(CollectTransform),
-    DotbinTransform(DotbinTransform),
-    ExtentTransform(ExtentTransform),
-    FormulaTransform(FormulaTransform),
-    JoinaggregateTransform(JoinaggregateTransform),
-    LookupTransform(LookupTransform),
-    SampleTransform(SampleTransform),
-    TimeunitTransform(TimeunitTransform),
-    WindowTransform(WindowTransform),
-    IdentifierTransform(IdentifierTransform),
-    VoronoiTransform(VoronoiTransform),
-    WordcloudTransform(WordcloudTransform),
+    #[serde(rename = "CrossfilterTransform")]
+    Crossfilter(CrossfilterTransform),
+    #[serde(rename = "ResolvefilterTransform")]
+    Resolvefilter(ResolvefilterTransform),
+    #[serde(rename = "LinkpathTransform")]
+    Linkpath(LinkpathTransform),
+    #[serde(rename = "PieTransform")]
+    Pie(PieTransform),
+    #[serde(rename = "StackTransform")]
+    Stack(StackTransform),
+    #[serde(rename = "ForceTransform")]
+    Force(ForceTransform),
+    #[serde(rename = "GeojsonTransform")]
+    Geojson(GeojsonTransform),
+    #[serde(rename = "GeopathTransform")]
+    Geopath(GeopathTransform),
+    #[serde(rename = "GeopointTransform")]
+    Geopoint(GeopointTransform),
+    #[serde(rename = "GeoshapeTransform")]
+    Geoshape(GeoshapeTransform),
+    #[serde(rename = "HeatmapTransform")]
+    Heatmap(HeatmapTransform),
+    #[serde(rename = "PackTransform")]
+    Pack(PackTransform),
+    #[serde(rename = "PartitionTransform")]
+    Partition(PartitionTransform),
+    #[serde(rename = "StratifyTransform")]
+    Stratify(StratifyTransform),
+    #[serde(rename = "TreeTransform")]
+    Tree(TreeTransform),
+    #[serde(rename = "TreemapTransform")]
+    Treemap(TreemapTransform),
+    #[serde(rename = "LabelTransform")]
+    Label(LabelTransform),
+    #[serde(rename = "BinTransform")]
+    Bin(BinTransform),
+    #[serde(rename = "CollectTransform")]
+    Collect(CollectTransform),
+    #[serde(rename = "DotbinTransform")]
+    Dotbin(DotbinTransform),
+    #[serde(rename = "ExtentTransform")]
+    Extent(ExtentTransform),
+    #[serde(rename = "FormulaTransform")]
+    Formula(FormulaTransform),
+    #[serde(rename = "JoinaggregateTransform")]
+    Joinaggregate(JoinaggregateTransform),
+    #[serde(rename = "LookupTransform")]
+    Lookup(LookupTransform),
+    #[serde(rename = "SampleTransform")]
+    Sample(SampleTransform),
+    #[serde(rename = "TimeunitTransform")]
+    Timeunit(TimeunitTransform),
+    #[serde(rename = "WindowTransform")]
+    Window(WindowTransform),
+    #[serde(rename = "IdentifierTransform")]
+    Identifier(IdentifierTransform),
+    #[serde(rename = "VoronoiTransform")]
+    Voronoi(VoronoiTransform),
+    #[serde(rename = "WordcloudTransform")]
+    Wordcloud(WordcloudTransform),
 }
 impl ::std::convert::From<CrossfilterTransform> for TransformMark {
     fn from(value: CrossfilterTransform) -> Self {
-        Self::CrossfilterTransform(value)
+        Self::Crossfilter(value)
     }
 }
 impl ::std::convert::From<ResolvefilterTransform> for TransformMark {
     fn from(value: ResolvefilterTransform) -> Self {
-        Self::ResolvefilterTransform(value)
+        Self::Resolvefilter(value)
     }
 }
 impl ::std::convert::From<LinkpathTransform> for TransformMark {
     fn from(value: LinkpathTransform) -> Self {
-        Self::LinkpathTransform(value)
+        Self::Linkpath(value)
     }
 }
 impl ::std::convert::From<PieTransform> for TransformMark {
     fn from(value: PieTransform) -> Self {
-        Self::PieTransform(value)
+        Self::Pie(value)
     }
 }
 impl ::std::convert::From<StackTransform> for TransformMark {
     fn from(value: StackTransform) -> Self {
-        Self::StackTransform(value)
+        Self::Stack(value)
     }
 }
 impl ::std::convert::From<ForceTransform> for TransformMark {
     fn from(value: ForceTransform) -> Self {
-        Self::ForceTransform(value)
+        Self::Force(value)
     }
 }
 impl ::std::convert::From<GeojsonTransform> for TransformMark {
     fn from(value: GeojsonTransform) -> Self {
-        Self::GeojsonTransform(value)
+        Self::Geojson(value)
     }
 }
 impl ::std::convert::From<GeopathTransform> for TransformMark {
     fn from(value: GeopathTransform) -> Self {
-        Self::GeopathTransform(value)
+        Self::Geopath(value)
     }
 }
 impl ::std::convert::From<GeopointTransform> for TransformMark {
     fn from(value: GeopointTransform) -> Self {
-        Self::GeopointTransform(value)
+        Self::Geopoint(value)
     }
 }
 impl ::std::convert::From<GeoshapeTransform> for TransformMark {
     fn from(value: GeoshapeTransform) -> Self {
-        Self::GeoshapeTransform(value)
+        Self::Geoshape(value)
     }
 }
 impl ::std::convert::From<HeatmapTransform> for TransformMark {
     fn from(value: HeatmapTransform) -> Self {
-        Self::HeatmapTransform(value)
+        Self::Heatmap(value)
     }
 }
 impl ::std::convert::From<PackTransform> for TransformMark {
     fn from(value: PackTransform) -> Self {
-        Self::PackTransform(value)
+        Self::Pack(value)
     }
 }
 impl ::std::convert::From<PartitionTransform> for TransformMark {
     fn from(value: PartitionTransform) -> Self {
-        Self::PartitionTransform(value)
+        Self::Partition(value)
     }
 }
 impl ::std::convert::From<StratifyTransform> for TransformMark {
     fn from(value: StratifyTransform) -> Self {
-        Self::StratifyTransform(value)
+        Self::Stratify(value)
     }
 }
 impl ::std::convert::From<TreeTransform> for TransformMark {
     fn from(value: TreeTransform) -> Self {
-        Self::TreeTransform(value)
+        Self::Tree(value)
     }
 }
 impl ::std::convert::From<TreemapTransform> for TransformMark {
     fn from(value: TreemapTransform) -> Self {
-        Self::TreemapTransform(value)
+        Self::Treemap(value)
     }
 }
 impl ::std::convert::From<LabelTransform> for TransformMark {
     fn from(value: LabelTransform) -> Self {
-        Self::LabelTransform(value)
+        Self::Label(value)
     }
 }
 impl ::std::convert::From<BinTransform> for TransformMark {
     fn from(value: BinTransform) -> Self {
-        Self::BinTransform(value)
+        Self::Bin(value)
     }
 }
 impl ::std::convert::From<CollectTransform> for TransformMark {
     fn from(value: CollectTransform) -> Self {
-        Self::CollectTransform(value)
+        Self::Collect(value)
     }
 }
 impl ::std::convert::From<DotbinTransform> for TransformMark {
     fn from(value: DotbinTransform) -> Self {
-        Self::DotbinTransform(value)
+        Self::Dotbin(value)
     }
 }
 impl ::std::convert::From<ExtentTransform> for TransformMark {
     fn from(value: ExtentTransform) -> Self {
-        Self::ExtentTransform(value)
+        Self::Extent(value)
     }
 }
 impl ::std::convert::From<FormulaTransform> for TransformMark {
     fn from(value: FormulaTransform) -> Self {
-        Self::FormulaTransform(value)
+        Self::Formula(value)
     }
 }
 impl ::std::convert::From<JoinaggregateTransform> for TransformMark {
     fn from(value: JoinaggregateTransform) -> Self {
-        Self::JoinaggregateTransform(value)
+        Self::Joinaggregate(value)
     }
 }
 impl ::std::convert::From<LookupTransform> for TransformMark {
     fn from(value: LookupTransform) -> Self {
-        Self::LookupTransform(value)
+        Self::Lookup(value)
     }
 }
 impl ::std::convert::From<SampleTransform> for TransformMark {
     fn from(value: SampleTransform) -> Self {
-        Self::SampleTransform(value)
+        Self::Sample(value)
     }
 }
 impl ::std::convert::From<TimeunitTransform> for TransformMark {
     fn from(value: TimeunitTransform) -> Self {
-        Self::TimeunitTransform(value)
+        Self::Timeunit(value)
     }
 }
 impl ::std::convert::From<WindowTransform> for TransformMark {
     fn from(value: WindowTransform) -> Self {
-        Self::WindowTransform(value)
+        Self::Window(value)
     }
 }
 impl ::std::convert::From<IdentifierTransform> for TransformMark {
     fn from(value: IdentifierTransform) -> Self {
-        Self::IdentifierTransform(value)
+        Self::Identifier(value)
     }
 }
 impl ::std::convert::From<VoronoiTransform> for TransformMark {
     fn from(value: VoronoiTransform) -> Self {
-        Self::VoronoiTransform(value)
+        Self::Voronoi(value)
     }
 }
 impl ::std::convert::From<WordcloudTransform> for TransformMark {
     fn from(value: WordcloudTransform) -> Self {
-        Self::WordcloudTransform(value)
+        Self::Wordcloud(value)
     }
 }
 #[doc = "`TreeTransform`"]
@@ -43613,7 +43710,7 @@ pub enum TreeTransformAs {
 }
 impl ::std::default::Default for TreeTransformAs {
     fn default() -> Self {
-        TreeTransformAs::Array([
+        Self::Array([
             TreeTransformAsArrayItem::String("x".to_string()),
             TreeTransformAsArrayItem::String("y".to_string()),
             TreeTransformAsArrayItem::String("depth".to_string()),
@@ -43675,7 +43772,7 @@ pub enum TreeTransformMethod {
 }
 impl ::std::default::Default for TreeTransformMethod {
     fn default() -> Self {
-        TreeTransformMethod::Variant0(TreeTransformMethodVariant0::Tidy)
+        Self::Variant0(TreeTransformMethodVariant0::Tidy)
     }
 }
 impl ::std::convert::From<TreeTransformMethodVariant0> for TreeTransformMethod {
@@ -43782,7 +43879,7 @@ pub enum TreeTransformSeparation {
 }
 impl ::std::default::Default for TreeTransformSeparation {
     fn default() -> Self {
-        TreeTransformSeparation::Boolean(true)
+        Self::Boolean(true)
     }
 }
 impl ::std::convert::From<bool> for TreeTransformSeparation {
@@ -43996,7 +44093,7 @@ pub enum TreemapTransformAs {
 }
 impl ::std::default::Default for TreemapTransformAs {
     fn default() -> Self {
-        TreemapTransformAs::Array([
+        Self::Array([
             TreemapTransformAsArrayItem::String("x0".to_string()),
             TreemapTransformAsArrayItem::String("y0".to_string()),
             TreemapTransformAsArrayItem::String("x1".to_string()),
@@ -44060,7 +44157,7 @@ pub enum TreemapTransformMethod {
 }
 impl ::std::default::Default for TreemapTransformMethod {
     fn default() -> Self {
-        TreemapTransformMethod::Variant0(TreemapTransformMethodVariant0::Squarify)
+        Self::Variant0(TreemapTransformMethodVariant0::Squarify)
     }
 }
 impl ::std::convert::From<TreemapTransformMethodVariant0> for TreemapTransformMethod {
@@ -44268,7 +44365,7 @@ pub enum TreemapTransformRatio {
 }
 impl ::std::default::Default for TreemapTransformRatio {
     fn default() -> Self {
-        TreemapTransformRatio::Number(1.618033988749895_f64)
+        Self::Number(1.618033988749895_f64)
     }
 }
 impl ::std::convert::From<f64> for TreemapTransformRatio {
@@ -44405,7 +44502,7 @@ pub enum VoronoiTransformAs {
 }
 impl ::std::default::Default for VoronoiTransformAs {
     fn default() -> Self {
-        VoronoiTransformAs::String("path".to_string())
+        Self::String("path".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for VoronoiTransformAs {
@@ -44422,7 +44519,7 @@ pub enum VoronoiTransformExtent {
 }
 impl ::std::default::Default for VoronoiTransformExtent {
     fn default() -> Self {
-        VoronoiTransformExtent::Array([
+        Self::Array([
             ::serde_json::from_str::<::serde_json::Value>("[-100000,-100000]").unwrap(),
             ::serde_json::from_str::<::serde_json::Value>("[100000,100000]").unwrap(),
         ])
@@ -44675,7 +44772,7 @@ pub enum WindowTransformFrame {
 }
 impl ::std::default::Default for WindowTransformFrame {
     fn default() -> Self {
-        WindowTransformFrame::Array([
+        Self::Array([
             WindowTransformFrameArrayItem::Null,
             WindowTransformFrameArrayItem::Number(0_f64),
         ])
@@ -45129,7 +45226,7 @@ pub enum WordcloudTransformAs {
 }
 impl ::std::default::Default for WordcloudTransformAs {
     fn default() -> Self {
-        WordcloudTransformAs::Array([
+        Self::Array([
             WordcloudTransformAsArrayItem::String("x".to_string()),
             WordcloudTransformAsArrayItem::String("y".to_string()),
             WordcloudTransformAsArrayItem::String("font".to_string()),
@@ -45173,7 +45270,7 @@ pub enum WordcloudTransformFont {
 }
 impl ::std::default::Default for WordcloudTransformFont {
     fn default() -> Self {
-        WordcloudTransformFont::String("sans-serif".to_string())
+        Self::String("sans-serif".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for WordcloudTransformFont {
@@ -45202,7 +45299,7 @@ pub enum WordcloudTransformFontSize {
 }
 impl ::std::default::Default for WordcloudTransformFontSize {
     fn default() -> Self {
-        WordcloudTransformFontSize::Number(14_f64)
+        Self::Number(14_f64)
     }
 }
 impl ::std::convert::From<f64> for WordcloudTransformFontSize {
@@ -45235,7 +45332,7 @@ pub enum WordcloudTransformFontSizeRange {
 }
 impl ::std::default::Default for WordcloudTransformFontSizeRange {
     fn default() -> Self {
-        WordcloudTransformFontSizeRange::Array(vec![
+        Self::Array(vec![
             WordcloudTransformFontSizeRangeArrayItem::Number(10_f64),
             WordcloudTransformFontSizeRangeArrayItem::Number(50_f64),
         ])
@@ -45281,7 +45378,7 @@ pub enum WordcloudTransformFontStyle {
 }
 impl ::std::default::Default for WordcloudTransformFontStyle {
     fn default() -> Self {
-        WordcloudTransformFontStyle::String("normal".to_string())
+        Self::String("normal".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for WordcloudTransformFontStyle {
@@ -45310,7 +45407,7 @@ pub enum WordcloudTransformFontWeight {
 }
 impl ::std::default::Default for WordcloudTransformFontWeight {
     fn default() -> Self {
-        WordcloudTransformFontWeight::String("normal".to_string())
+        Self::String("normal".to_string())
     }
 }
 impl ::std::convert::From<SignalRef> for WordcloudTransformFontWeight {

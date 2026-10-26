@@ -28,31 +28,54 @@ impl TypeEntry {
         value: &serde_json::Value,
         scope: &TokenStream,
     ) -> Option<TokenStream> {
+        self.output_value_inner(type_space, value, scope, false)
+    }
+
+    /// Emit the outer constructor as `Self` inside this type's impl only.
+    /// Nested values still use their own concrete types.
+    pub(crate) fn output_value_for_self(
+        &self,
+        type_space: &TypeSpace,
+        value: &serde_json::Value,
+    ) -> Option<TokenStream> {
+        self.output_value_inner(type_space, value, &quote! {}, true)
+    }
+
+    fn output_value_inner(
+        &self,
+        type_space: &TypeSpace,
+        value: &serde_json::Value,
+        scope: &TokenStream,
+        use_self: bool,
+    ) -> Option<TokenStream> {
         let v = match &self.details {
             TypeEntryDetails::Enum(TypeEntryEnum {
                 name,
                 tag_type,
                 variants,
                 ..
-            }) => match tag_type {
-                EnumTagType::External => {
-                    value_for_external_enum(type_space, name, variants, value, scope)?
+            }) => {
+                let name = if use_self { "Self" } else { name };
+                match tag_type {
+                    EnumTagType::External => {
+                        value_for_external_enum(type_space, name, variants, value, scope)?
+                    }
+                    EnumTagType::Internal { tag } => {
+                        value_for_internal_enum(type_space, name, variants, value, tag, scope)?
+                    }
+                    EnumTagType::Adjacent { tag, content } => value_for_adjacent_enum(
+                        type_space, name, variants, value, tag, content, scope,
+                    )?,
+                    EnumTagType::Untagged => {
+                        value_for_untagged_enum(type_space, name, variants, value, scope)?
+                    }
                 }
-                EnumTagType::Internal { tag } => {
-                    value_for_internal_enum(type_space, name, variants, value, tag, scope)?
-                }
-                EnumTagType::Adjacent { tag, content } => {
-                    value_for_adjacent_enum(type_space, name, variants, value, tag, content, scope)?
-                }
-                EnumTagType::Untagged => {
-                    value_for_untagged_enum(type_space, name, variants, value, scope)?
-                }
-            },
+            }
             TypeEntryDetails::Struct(TypeEntryStruct {
                 name, properties, ..
             }) => {
                 let props = value_for_struct_props(properties, value, type_space, scope)?;
-                let ident = format_ident!("{}", name);
+                let ident = format_ident!("{}", if use_self { "Self" } else { name });
                 quote! { #scope #ident { #( #props ),* }}
             }
             TypeEntryDetails::Newtype(TypeEntryNewtype { name, type_id, .. }) => {
@@ -61,7 +84,7 @@ impl TypeEntry {
                     .get(type_id)
                     .unwrap()
                     .output_value(type_space, value, scope);
-                let ident = format_ident!("{}", name);
+                let ident = format_ident!("{}", if use_self { "Self" } else { name });
                 quote! { #scope #ident ( #inner )}
             }
 
@@ -400,7 +423,9 @@ fn value_for_struct_props(
 
             Some(quote! { #name_ident: #prop_value })
         } else {
-            Some(quote! { #name_ident: Default::default() })
+            let type_entry = type_space.id_to_entry.get(&prop.type_id).unwrap();
+            let ty = type_entry.type_ident_in_scope(type_space, scope);
+            Some(quote! { #name_ident: <#ty>::default() })
         }
     });
 
@@ -455,6 +480,64 @@ mod tests {
     use uuid::Uuid;
 
     use crate::{test_util::get_type, type_entry::TypeEntry};
+
+    #[test]
+    fn self_constructor_does_not_replace_nested_types() {
+        let schema = serde_json::from_value(json!({
+            "title": "Outer",
+            "type": "object",
+            "definitions": {
+                "Child": { "type": "string", "enum": ["child"] }
+            },
+            "properties": {
+                "inner": { "type": "string", "enum": ["first", "second"] },
+                "omitted": { "$ref": "#/definitions/Child" }
+            },
+            "required": ["inner"]
+        }))
+        .unwrap();
+        let mut type_space = crate::TypeSpace::default();
+        let id = type_space.add_root_schema(schema).unwrap().unwrap();
+        let entry = type_space.id_to_entry.get(&id).unwrap();
+        let value = json!({"inner": "second"});
+        let omitted_type = quote! { ::std::option::Option<Child> };
+        let expected = quote! {
+            Self {
+                inner: OuterInner::Second,
+                omitted: <#omitted_type>::default()
+            }
+        };
+        assert_eq!(
+            entry
+                .output_value_for_self(&type_space, &value)
+                .unwrap()
+                .to_string(),
+            expected.to_string()
+        );
+        let scoped = entry
+            .output_value(&type_space, &value, &quote! { super:: })
+            .unwrap();
+        assert!(scoped.to_string().contains("super :: OuterInner :: Second"));
+        assert!(scoped.to_string().starts_with("super :: Outer"));
+        let scoped_type = quote! { ::std::option::Option<super::Child> };
+        assert!(scoped
+            .to_string()
+            .contains(&quote! { <#scoped_type>::default() }.to_string()));
+
+        let wrapper = crate::type_entry::TypeEntryNewtype::from_metadata(
+            &type_space,
+            crate::Name::Required("Wrapper".to_string()),
+            &None,
+            id,
+            schemars::schema::Schema::Bool(true),
+        );
+        let wrapped = wrapper
+            .output_value_for_self(&type_space, &value)
+            .unwrap()
+            .to_string();
+        assert!(wrapped.starts_with("Self (Outer {"), "{wrapped}");
+        assert!(wrapped.contains("OuterInner :: Second"), "{wrapped}");
+    }
 
     #[test]
     fn test_value_option() {
@@ -611,6 +694,7 @@ mod tests {
 
     #[test]
     fn test_struct_simple_super_scoped() {
+        let option_type = quote! { ::std::option::Option<f64> };
         #[derive(JsonSchema)]
         #[allow(dead_code)]
         struct Test {
@@ -643,7 +727,7 @@ mod tests {
                         a: "aaaa".to_string(),
                         b: 7_u32,
                         c: ::std::option::Option::Some("cccc".to_string()),
-                        d: Default::default()
+                        d: <#option_type>::default()
                     }
                 }
                 .to_string()
@@ -653,6 +737,7 @@ mod tests {
 
     #[test]
     fn test_struct_simple() {
+        let option_type = quote! { ::std::option::Option<f64> };
         #[derive(JsonSchema)]
         #[allow(dead_code)]
         struct Test {
@@ -685,7 +770,7 @@ mod tests {
                         a: "aaaa".to_string(),
                         b: 7_u32,
                         c: ::std::option::Option::Some("cccc".to_string()),
-                        d: Default::default()
+                        d: <#option_type>::default()
                     }
                 }
                 .to_string()
