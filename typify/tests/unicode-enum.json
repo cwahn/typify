@@ -1,0 +1,14 @@
+{
+  "title": "UnicodeEnums",
+  "type": "object",
+  "definitions": {
+    "HuggingFaceReaction": {
+      "type": "string",
+      "enum": ["🔥", "🚀", "👀", "❤️", "🤗", "😎", "➕", "🧠", "👍", "🤝", "😔", "🤯"]
+    },
+    "Adversarial": {
+      "type": "string",
+      "enum": ["🔥", "🚀", "❤️", "❤", "U1F525", "U21", "uU21", "!", "?", "", "X", "U", "Éclair", "中文", "a-b", "a b", "a_b", "aXb"]
+    }
+  }
+}

@@ -292,8 +292,48 @@ impl TypeEntryEnum {
             });
         }
 
-        // If variants still aren't unique, we fail: we'd rather not emit code
-        // that can't compile
+        // Only replace names that still collide. Encode every Unicode scalar,
+        // including punctuation and variation selectors, without losing data.
+        // Reserve the other names first so an existing identifier wins over
+        // the fallback for the fire emoji, regardless of the variant order.
+        if !variants_unique(&variants) {
+            let mut counts = HashMap::new();
+            for variant in &variants {
+                *counts
+                    .entry(variant.ident_name.clone().unwrap())
+                    .or_insert(0usize) += 1;
+            }
+            let reserved = counts
+                .iter()
+                .filter(|(_, count)| **count == 1)
+                .map(|(name, _)| name.as_str())
+                .collect::<BTreeSet<_>>();
+            for variant in &mut variants {
+                if counts[variant.ident_name.as_ref().unwrap()] == 1 {
+                    continue;
+                }
+                let mut name = variant
+                    .raw_name
+                    .chars()
+                    .map(|c| format!("U{:X}", u32::from(c)))
+                    .collect::<String>();
+                if name.is_empty() {
+                    name.push('U');
+                }
+                // Scalar encodings start with U followed by hex digits, so
+                // extra leading U's cannot conflate distinct raw values. The
+                // empty string is represented by U alone. No order-dependent
+                // counters or lossy hashes are needed, even for collisions
+                // with literal names that already resemble an encoding.
+                while reserved.contains(name.as_str()) {
+                    name.insert(0, 'U');
+                }
+                variant.ident_name = Some(name);
+            }
+        }
+
+        // Identical raw names still cannot be represented as distinct variants.
+        // Fail rather than emit code that can't compile.
         if !variants_unique(&variants) {
             let mut counts = HashMap::new();
             variants.iter().for_each(|variant| {
@@ -2175,10 +2215,120 @@ fn untagged_newtype_string(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+
+    use super::{EnumTagType, TypeEntryEnum, Variant, VariantDetails};
     use crate::{
         type_entry::{SchemaWrapper, TypeEntry, TypeEntryStruct},
-        TypeEntryDetails, TypeSpace,
+        Name, TypeEntryDetails, TypeSpace,
     };
+
+    fn variant_names(values: &[&str]) -> BTreeMap<String, String> {
+        let entry = TypeEntryEnum::from_metadata(
+            &TypeSpace::default(),
+            Name::Required("Example".to_string()),
+            &None,
+            EnumTagType::External,
+            values
+                .iter()
+                .map(|value| Variant::new((*value).to_string(), None, VariantDetails::Simple))
+                .collect(),
+            false,
+            schemars::schema::Schema::Bool(true),
+        );
+        let TypeEntryDetails::Enum(entry) = entry.details else {
+            unreachable!();
+        };
+        entry
+            .variants
+            .into_iter()
+            .map(|variant| (variant.raw_name, variant.ident_name.unwrap()))
+            .collect()
+    }
+
+    #[test]
+    fn unicode_variant_names_are_lossless_and_order_independent() {
+        // Exact 12-value enum from Hugging Face's public OpenAPI schema.
+        let mut values = [
+            "🔥", "🚀", "👀", "❤️", "🤗", "😎", "➕", "🧠", "👍", "🤝", "😔", "🤯",
+        ];
+        let expected = values
+            .iter()
+            .zip([
+                "U1F525",
+                "U1F680",
+                "U1F440",
+                "U2764UFE0F",
+                "U1F917",
+                "U1F60E",
+                "U2795",
+                "U1F9E0",
+                "U1F44D",
+                "U1F91D",
+                "U1F614",
+                "U1F92F",
+            ])
+            .map(|(raw, name)| ((*raw).to_string(), name.to_string()))
+            .collect();
+        for _ in 0..values.len() {
+            assert_eq!(variant_names(&values), expected);
+            assert_eq!(variant_names(&values), expected);
+            values.rotate_left(1);
+        }
+        values.reverse();
+        assert_eq!(variant_names(&values), expected);
+    }
+
+    #[test]
+    fn unicode_variant_names_reserve_existing_identifiers() {
+        let mut values = [
+            "🔥", "🚀", "❤️", "❤", "U1F525", "U21", "uU21", "!", "?", "", "X", "U", "Éclair",
+            "中文", "a-b", "a b", "a_b", "aXb",
+        ];
+        let expected = variant_names(&values);
+        assert_eq!(expected["🔥"], "U1F525");
+        assert_eq!(expected["❤️"], "U2764UFE0F");
+        assert_eq!(expected["❤"], "U2764");
+        assert_eq!(expected["!"], "UUU21");
+        assert_eq!(expected["?"], "U3F");
+        assert_eq!(expected[""], "UU");
+        assert_eq!(expected["U1F525"], "U1f525");
+        assert_eq!(expected["U21"], "U21");
+        assert_eq!(expected["uU21"], "UU21");
+        for preserved in ["U", "Éclair", "中文"] {
+            assert_eq!(expected[preserved], preserved);
+        }
+        assert_eq!(
+            expected
+                .values()
+                .collect::<std::collections::BTreeSet<_>>()
+                .len(),
+            values.len()
+        );
+        for _ in 0..values.len() {
+            values.rotate_left(1);
+            assert_eq!(variant_names(&values), expected);
+        }
+        values.reverse();
+        assert_eq!(variant_names(&values), expected);
+    }
+
+    #[test]
+    fn unicode_fallback_does_not_change_successful_existing_passes() {
+        assert_eq!(variant_names(&["🔥"])["🔥"], "X");
+        let names = variant_names(&["a-b", "ab"]);
+        assert_eq!(names["a-b"], "AB");
+        assert_eq!(names["ab"], "Ab");
+        let names = variant_names(&["a-b", "aB"]);
+        assert_eq!(names["a-b"], "AXb");
+        assert_eq!(names["aB"], "AB");
+    }
+
+    #[test]
+    #[should_panic(expected = "Failed to make unique variant names")]
+    fn unicode_fallback_still_rejects_duplicate_raw_variants() {
+        variant_names(&["🔥", "🔥"]);
+    }
 
     #[test]
     fn test_ident() {
